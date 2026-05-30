@@ -1,22 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f1e8;
-  --foreground: #1e1b16;
+  /* Base colors */
+  --app-bg: #0F2418;
+  --color-surface: #162E20;
+  --color-surface-elevated: #1C3828;
+  --color-border: #2A4A35;
+  --color-border-elevated: #1F3D29;
+
+  /* Text colors */
+  --color-text-primary: #F0F7F2;
+  --color-text-secondary: #8AAF95;
+  --color-text-muted: #4A6B55;
+  --color-text-disabled: #2E4D38;
+
+  /* Accent colors */
+  --color-accent-primary: #4ADE80;
+  --color-accent-danger: #F87171;
+  --color-accent-warning: #FBBF24;
+
+  /* Semantic backgrounds */
+  --color-success-bg: rgba(74, 222, 128, 0.12);
+  --color-danger-bg: rgba(248, 113, 113, 0.1);
+  --color-warning-bg: rgba(251, 191, 36, 0.1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 4px 20px rgba(74, 222, 128, 0.3);
+  --shadow-glow-success: 0 0 8px rgba(74, 222, 128, 0.5);
+  --shadow-glow-warning: 0 0 8px rgba(251, 191, 36, 0.5);
+  --shadow-glow-danger: 0 0 8px rgba(248, 113, 113, 0.5);
+
+  /* Spacing */
+  --spacing-px: 1px;
+  --spacing-05: 2px;
+  --spacing-1: 4px;
+  --spacing-15: 6px;
+  --spacing-2: 8px;
+  --spacing-25: 10px;
+  --spacing-3: 12px;
+  --spacing-35: 14px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+
+  /* Border radius */
+  --radius-sm: 9px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 22px;
+
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-jakarta-sans);
   --font-mono: var(--font-dm-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0d1214;
-    --foreground: #f4efe8;
-  }
 }
 
 * {
@@ -29,8 +69,19 @@ html {
 
 body {
   min-height: 100vh;
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--app-bg);
+  color: var(--color-text-primary);
   font-family: var(--font-jakarta-sans), Arial, Helvetica, sans-serif;
   margin: 0;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
