@@ -143,7 +143,7 @@ function LookupContent() {
 
       {/* BODY */}
       <div className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-[560px] pb-16 pt-8">
+        <div className="mx-auto w-full max-w-[560px] pb-10 pt-6 sm:pb-16 sm:pt-8">
           {/* LOOKUP FORM */}
           <LookupForm value={input} onChange={setInput} onLookup={handleLookup} loading={isLoading} />
 

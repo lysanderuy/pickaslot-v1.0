@@ -274,7 +274,7 @@ export default function BookPage() {
 
       <div className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8">
         {/* Hero Card */}
-        <section className="relative mt-4 overflow-hidden rounded-[20px] border border-[#2A4A35] bg-[#162E20] p-5">
+        <section className="relative mt-3 overflow-hidden rounded-[18px] border border-[#2A4A35] bg-[#162E20] p-4 sm:mt-4 sm:rounded-[20px] sm:p-5">
           <svg
             className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.13]"
             viewBox="0 0 1000 454"
@@ -291,13 +291,14 @@ export default function BookPage() {
             </g>
           </svg>
           <div className="relative z-[1]">
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <h1 className="m-0 text-[22px] font-extrabold leading-[1.1] tracking-[-0.02em] text-[#F0F7F2]">
+            <div className="mb-4 flex items-start justify-between gap-3 sm:gap-4">
+              <div className="min-w-0 flex-1">
+                <h1 className="m-0 text-xl font-extrabold leading-[1.1] tracking-[-0.02em] text-[#F0F7F2] sm:text-[22px]">
                   {court.name}
                 </h1>
-                <p className="mt-1 flex items-center gap-1 text-xs font-medium text-[#8AAF95]">
-                  📍 {court.location}
+                <p className="mt-1 flex items-start gap-1 text-xs font-medium text-[#8AAF95]">
+                  <span className="shrink-0">📍</span>
+                  <span className="min-w-0 break-words">{court.location}</span>
                 </p>
               </div>
               <div
@@ -326,11 +327,11 @@ export default function BookPage() {
                 </span>
               </div>
             </div>
-            <div className="flex items-center justify-between border-t border-[#2A4A35] pt-4">
+            <div className="grid grid-cols-3 gap-x-2 gap-y-3 border-t border-[#2A4A35] pt-4 sm:flex sm:items-center sm:justify-between sm:gap-0">
               <HeroStat label="Rate" value={priceLabel} accent="/hr" />
-              <div className="h-8 w-px bg-[#2A4A35]" />
+              <div className="hidden h-8 w-px bg-[#2A4A35] sm:block" />
               <HeroStat label="Hours" value={hoursLabel} />
-              <div className="h-8 w-px bg-[#2A4A35]" />
+              <div className="hidden h-8 w-px bg-[#2A4A35] sm:block" />
               <HeroStat label="Slots Today" value={availabilityLoading ? "-" : String(openCount)} accent="open" />
             </div>
           </div>
@@ -374,7 +375,7 @@ export default function BookPage() {
           </div>
         </div>
 
-        <CourtInfoCard court={court} />
+        <CourtInfoCard court={court} reserveBarVisible={selectedSlotStarts.length > 0} />
       </div>
 
       <ReserveBar

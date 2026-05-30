@@ -57,7 +57,7 @@ export function StatusBanner({ status }: StatusBannerProps) {
 
   return (
     <div
-      className="flex items-center gap-3 rounded-[12px] border px-4 py-3.5"
+      className="flex items-start gap-3 rounded-[12px] border px-3.5 py-3 sm:px-4 sm:py-3.5"
       style={{ background: cfg.bannerBg, borderColor: cfg.bannerBorder }}
     >
       <span className={cx("h-2.5 w-2.5 shrink-0 rounded-full", cfg.dotClass)} />

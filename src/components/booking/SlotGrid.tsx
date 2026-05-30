@@ -164,7 +164,7 @@ export function SlotGrid({
               >
                 <span
                   className={cx(
-                    "whitespace-nowrap text-base font-extrabold leading-none tracking-[-0.02em]",
+                    "whitespace-nowrap text-[15px] font-extrabold leading-none tracking-[-0.02em] sm:text-base",
                     slotTextClass(state, selected)
                   )}
                 >

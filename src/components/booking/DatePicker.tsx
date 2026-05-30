@@ -91,7 +91,7 @@ export function DatePicker({
             </svg>
           </span>
           <span>
-            <span className="block text-base font-bold leading-none tracking-[-0.01em] text-[#F0F7F2]">
+            <span className="block text-sm font-bold leading-none tracking-[-0.01em] text-[#F0F7F2] sm:text-base">
               {dateLabel(selectedDate)}
             </span>
             <span className="mt-[3px] block text-[11px] font-medium text-[#8AAF95]">
@@ -99,8 +99,10 @@ export function DatePicker({
             </span>
           </span>
         </span>
-        <span className="flex items-center gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-[0.05em] text-[#4ADE80]">Change</span>
+        <span className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <span className="hidden text-[11px] font-bold uppercase tracking-[0.05em] text-[#4ADE80] min-[380px]:inline">
+            Change
+          </span>
           <span
             className={cx(
               "flex h-[22px] w-[22px] items-center justify-center rounded-md bg-[rgba(74,222,128,0.12)] text-[#4ADE80] transition",
@@ -191,7 +193,7 @@ export function DatePicker({
               key={toDateKey(day)}
               type="button"
               className={cx(
-                "flex flex-col items-center gap-1 rounded-[10px] border px-1 py-2 transition active:scale-95",
+                "flex flex-col items-center gap-0.5 rounded-[10px] border px-0.5 py-1.5 transition active:scale-95 sm:gap-1 sm:px-1 sm:py-2",
                 active
                   ? "border-[#4ADE80] bg-[#4ADE80] shadow-[0_3px_14px_rgba(74,222,128,0.25)]"
                   : "border-[#2A4A35] bg-[#162E20]",
@@ -215,7 +217,7 @@ export function DatePicker({
               </span>
               <span
                 className={cx(
-                  "text-base font-bold leading-none",
+                  "text-sm font-bold leading-none sm:text-base",
                   active ? "text-[#0F2418]" : isToday ? "text-[#4ADE80]" : "text-[#8AAF95]"
                 )}
               >

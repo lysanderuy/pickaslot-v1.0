@@ -7,6 +7,7 @@ import type { Court } from "@/types/bookings";
 
 interface CourtInfoCardProps {
   court: Court;
+  reserveBarVisible?: boolean;
 }
 
 function splitLines(value: string) {
@@ -30,14 +31,19 @@ function InfoRow({ icon, label, children }: { icon: string; label: string; child
   );
 }
 
-export function CourtInfoCard({ court }: CourtInfoCardProps) {
+export function CourtInfoCard({ court, reserveBarVisible = false }: CourtInfoCardProps) {
   const [open, setOpen] = useState(false);
   const ruleLines = splitLines(court.houseRules ?? "");
   const paymentLines = splitLines(court.paymentInstructions ?? "");
   const priceLabel = `${(court.pricePerHourCents / 100).toLocaleString("en-PH", { maximumFractionDigits: 0, style: "currency", currency: "PHP" })}`;
 
   return (
-    <section className="pt-6 pb-12 lg:pb-16">
+    <section
+      className={cx(
+        "pt-6 lg:pb-16",
+        reserveBarVisible ? "pb-44 sm:pb-48 lg:pb-36" : "pb-12 lg:pb-16"
+      )}
+    >
       <div className={`${tw.sectionLabel} mb-3`}>Court Info</div>
       <div className="overflow-hidden rounded-[14px] border border-[#2A4A35] bg-[#162E20]">
         <button
@@ -146,7 +152,6 @@ export function CourtInfoCard({ court }: CourtInfoCardProps) {
           </div>
         </div>
       </div>
-      <div className="h-2" />
     </section>
   );
 }

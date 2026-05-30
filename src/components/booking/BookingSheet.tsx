@@ -53,6 +53,8 @@ export function BookingSheet({
   submitError,
   submitting,
 }: BookingSheetProps) {
+  const slotListScrollable = selectedSlots.length > 4;
+
   return (
     <>
       {/* Backdrop overlay */}
@@ -68,9 +70,10 @@ export function BookingSheet({
       {/* Sheet */}
       <div
         className={cx(
-          "fixed bottom-0 left-1/2 z-[101] w-full max-w-[430px] -translate-x-1/2 overflow-hidden rounded-t-[22px] border-t-2 border-[#4ADE80] bg-[#162E20] transition-transform duration-[320ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)]",
+          "fixed bottom-0 left-1/2 z-[101] flex w-full max-w-[430px] -translate-x-1/2 flex-col overflow-hidden rounded-t-[22px] border-t-2 border-[#4ADE80] bg-[#162E20] transition-transform duration-[320ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)]",
+          "max-h-[min(93dvh,100%)]",
           open ? "translate-y-0" : "translate-y-[104%]",
-          "md:bottom-auto md:top-1/2 md:max-w-[600px] md:rounded-[22px] md:border-2",
+          "md:bottom-auto md:top-1/2 md:max-h-[min(90dvh,100%)] md:max-w-[600px] md:rounded-[22px] md:border-2",
           open
             ? "md:-translate-y-1/2 md:opacity-100"
             : "md:-translate-y-1/2 md:opacity-0 md:pointer-events-none"
@@ -79,7 +82,10 @@ export function BookingSheet({
         aria-modal="true"
         aria-labelledby="sheet-title"
       >
-        <form className="px-5 pb-[52px] md:max-h-[85vh] md:overflow-y-auto md:px-6 md:pb-6" onSubmit={onSubmit}>
+        <form
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pb-[max(52px,env(safe-area-inset-bottom))] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:px-6 md:pb-6"
+          onSubmit={onSubmit}
+        >
           {/* Pull handle */}
           <div className="mx-auto mb-[22px] mt-3.5 h-1 w-9 rounded-sm bg-[#2A4A35]" />
 
@@ -96,20 +102,34 @@ export function BookingSheet({
 
           {/* Summary box */}
           <div className="mb-6 rounded-xl border border-[#2A4A35] bg-[#1C3828] px-4 py-3.5">
-            <div className={cx(tw.sectionLabel, "mb-2.5")}>Your Selection</div>
-            {selectedSlots.map((slot) => (
-              <div
-                key={slot.slot_start_at}
-                className="flex items-center justify-between border-b border-[#1F3D29] py-[7px] last:border-b-0"
-              >
-                <span className="text-sm font-semibold text-[#F0F7F2]">
-                  {formatTimeRange(slot.slot_start_at, slot.slot_end_at, timezone)}
+            <div className={cx(tw.sectionLabel, "mb-2.5 flex items-center justify-between gap-2")}>
+              <span>Your Selection</span>
+              {slotListScrollable && (
+                <span className="font-mono text-[10px] font-normal normal-case tracking-[0.02em] text-[#4A6B55]">
+                  {selectedSlots.length} slots
                 </span>
-                <span className="font-mono text-[12px] font-normal text-[#8AAF95]">
-                  {priceLabel}
-                </span>
-              </div>
-            ))}
+              )}
+            </div>
+            <div
+              className={cx(
+                slotListScrollable &&
+                  "max-h-[min(24vh,168px)] overflow-y-auto overscroll-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              )}
+            >
+              {selectedSlots.map((slot) => (
+                <div
+                  key={slot.slot_start_at}
+                  className="flex items-center justify-between gap-3 border-b border-[#1F3D29] py-[7px] last:border-b-0"
+                >
+                  <span className="min-w-0 text-sm font-semibold text-[#F0F7F2]">
+                    {formatTimeRange(slot.slot_start_at, slot.slot_end_at, timezone)}
+                  </span>
+                  <span className="shrink-0 font-mono text-[12px] font-normal text-[#8AAF95]">
+                    {priceLabel}
+                  </span>
+                </div>
+              ))}
+            </div>
             <div className="mt-1.5 flex items-center justify-between border-t border-[#2A4A35] pt-[11px]">
               <span className={tw.sectionLabel}>Estimated Total</span>
               <span className="text-[22px] font-extrabold tracking-[-0.02em] text-[#4ADE80]">

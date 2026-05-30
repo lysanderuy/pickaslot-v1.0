@@ -74,28 +74,28 @@ export function BookingCard({
   return (
     <div className="overflow-hidden rounded-[14px] border border-[#2A4A35] bg-[#162E20]">
       {/* Code + name row */}
-      <div className="flex items-center justify-between gap-3 border-b border-[#2A4A35] px-5 pb-4 pt-5">
-        <div>
+      <div className="flex flex-col gap-4 border-b border-[#2A4A35] px-4 pb-4 pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-5">
+        <div className="min-w-0">
           <p className={`${tw.sectionLabel} mb-1`}>Booking Code</p>
-          <p className="font-mono text-[28px] font-medium leading-none tracking-[0.08em] text-[#4ADE80]">
+          <p className="font-mono text-[24px] font-medium leading-none tracking-[0.08em] text-[#4ADE80] sm:text-[28px]">
             {bookingCode}
           </p>
         </div>
-        <div className="flex flex-col items-end gap-[3px]">
+        <div className="flex flex-col gap-[3px] sm:items-end">
           <span className={tw.sectionLabel}>Name</span>
           <span className="text-base font-bold tracking-[-0.01em] text-[#F0F7F2]">{fullName}</span>
         </div>
       </div>
 
       {/* Slots */}
-      <div className="border-b border-[#2A4A35] px-5 py-4">
+      <div className="border-b border-[#2A4A35] px-4 py-4 sm:px-5">
         <p className={`${tw.sectionLabel} mb-2`}>Reserved Slots</p>
         {slots.map((slot) => (
           <div
             key={slot.slot_start_at}
-            className="flex items-center justify-between border-b border-[#1F3D29] py-2 last:border-b-0"
+            className="flex flex-col gap-1 border-b border-[#1F3D29] py-2.5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:py-2"
           >
-            <span className="text-[15px] font-bold tracking-[-0.01em] text-[#F0F7F2]">
+            <span className="text-sm font-bold tracking-[-0.01em] text-[#F0F7F2] sm:text-[15px]">
               {formatTimeRange(slot.slot_start_at, slot.slot_end_at)}
             </span>
             <span className="font-mono text-[11px] text-[#4A6B55]">
@@ -106,7 +106,7 @@ export function BookingCard({
       </div>
 
       {/* Payment + total */}
-      <div className="flex items-center justify-between gap-3 px-5 py-4">
+      <div className="flex items-center justify-between gap-3 px-4 py-4 sm:px-5">
         <div className="flex flex-col gap-[3px]">
           <span className={tw.sectionLabel}>Payment</span>
           <span className="flex items-center gap-1.5 text-[15px] font-bold text-[#F0F7F2]">

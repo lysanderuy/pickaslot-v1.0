@@ -8,7 +8,7 @@ interface ErrorCardProps {
 export function ErrorCard({ title, description }: ErrorCardProps) {
   return (
     <div
-      className="flex animate-[fadeUp_0.18s_ease_both] items-start gap-3 rounded-[14px] border bg-[rgba(248,113,113,0.1)] px-5 py-4"
+      className="flex animate-[fadeUp_0.18s_ease_both] items-start gap-3 rounded-[14px] border bg-[rgba(248,113,113,0.1)] px-4 py-4 sm:px-5"
       style={{ borderColor: "rgba(248,113,113,0.2)" }}
     >
       <span className="mt-px shrink-0 text-xl">⚠️</span>
