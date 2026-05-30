@@ -13,6 +13,10 @@ interface BookingConfirmationProps {
   onClose: () => void;
 }
 
+/**
+ * Full-screen confirmation that appears after a successful booking submission.
+ * Design matches the `.cs` pattern from the design reference.
+ */
 export function BookingConfirmation({
   open,
   code,
@@ -22,42 +26,76 @@ export function BookingConfirmation({
   onClose,
 }: BookingConfirmationProps) {
   return (
-    <div
-      className={cx(
-        "pointer-events-none fixed inset-0 z-[120] translate-y-5 opacity-0 transition",
-        "md:flex md:items-center md:justify-center md:bg-[rgba(5,14,9,0.72)] md:backdrop-blur-md",
-        open && "pointer-events-auto translate-y-0 opacity-100"
-      )}
-    >
-      <div className="flex h-full flex-col bg-[#0F2418] md:h-auto md:w-full md:max-w-[480px] md:overflow-hidden md:rounded-[22px]">
-        <div className="px-6 pb-[22px] pt-[54px] md:pt-10">
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#4ADE80]">
+    <>
+      {/* Backdrop */}
+      <div
+        className={cx(
+          "fixed inset-0 z-[200] bg-[rgba(5,14,9,0.72)] opacity-0 backdrop-blur-[6px] transition-opacity duration-[180ms]",
+          open ? "opacity-100 pointer-events-auto" : "pointer-events-none"
+        )}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      />
+
+      {/* Sheet (bottom on mobile, centered modal on desktop) */}
+      <div
+        className={cx(
+          "fixed bottom-0 left-1/2 z-[201] flex w-full max-w-[430px] -translate-x-1/2 flex-col overflow-hidden bg-[#0F2418]",
+          "max-h-[min(92dvh,100%)] rounded-t-[22px] border-t-2 border-[#4ADE80]",
+          "transition-[transform,opacity] duration-[320ms] [transition-timing-function:cubic-bezier(0.32,0.72,0,1)]",
+          "md:bottom-auto md:top-1/2 md:max-h-[min(90dvh,100%)] md:w-[min(560px,calc(100vw-2rem))] md:max-w-none md:rounded-[22px] md:border-2",
+          open ? "translate-y-0" : "translate-y-full",
+          open
+            ? "md:-translate-x-1/2 md:-translate-y-1/2 md:opacity-100"
+            : "md:-translate-x-1/2 md:-translate-y-1/2 md:opacity-0 md:pointer-events-none"
+        )}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Pull handle - hidden on desktop */}
+        <div className="mx-auto mt-[14px] h-[4px] w-[36px] rounded-full bg-[#2A4A35] md:hidden" />
+
+        {/* Header */}
+        <div className="shrink-0 border-b border-[#2A4A35] px-[22px] pb-5 pt-5 md:pb-6 md:pt-8">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#4A6B55]">
             Booking Requested
           </div>
-          <div className="text-[32px] font-extrabold leading-[1.1] tracking-[-0.03em] text-[#F0F7F2]">
-            You&apos;re on
-            <br />
-            the <em className="not-italic text-[#4ADE80]">queue.</em>
-          </div>
-          <div className="mt-4 max-w-[300px] text-sm leading-6 text-[#8AAF95]">
-            Admin will confirm shortly. Save your booking code - you&apos;ll need it to check your status.
-          </div>
+          <h1 className="mb-2 text-[28px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#F0F7F2] md:text-[32px] md:text-balance">
+            You&apos;re on the{" "}
+            <em className="not-italic text-[#4ADE80]">queue.</em>
+          </h1>
+          <p className="text-[13px] leading-[1.5] text-[#8AAF95]">
+            Admin will confirm shortly. Save your booking code; you&apos;ll need it to check
+            your status.
+          </p>
         </div>
-        <div className="flex flex-1 flex-col gap-3.5 px-5 pb-6">
-          <div className={cx("border border-[#2A4A35] bg-[#162E20] rounded-[18px] p-[18px]")}>
+
+        {/* Body - scrollable */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-[22px] pb-5 pt-5 [scrollbar-width:none] md:pb-6 md:pt-6">
+          {/* Booking code card */}
+          <div className="relative mb-4 overflow-hidden rounded-2xl border border-[#2A4A35] bg-[#162E20] p-[18px]">
+            {/* Green top-accent bar per design */}
+            <div className="absolute left-0 right-0 top-0 h-0.5 bg-[linear-gradient(90deg,#4ADE80,transparent)]" />
+
             <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#4A6B55]">
               Your Booking Code
             </div>
-            <div className="my-3 font-mono text-[42px] font-medium tracking-[0.06em] text-[#4ADE80]">
-              {code || "-"}
+            <div className="mb-4 mt-2.5 font-mono text-[36px] font-medium leading-none tracking-[0.06em] text-[#4ADE80] md:text-[42px]">
+              {code || "..."}
             </div>
-            <div className="flex flex-col gap-2">
+
+            {/* Slot list */}
+            <div className="flex flex-col gap-[7px] border-t border-[#2A4A35] pt-[13px]">
               {slots.map((slot) => (
                 <div
                   key={slot.slot_start_at}
-                  className="flex justify-between gap-3 border-t border-[#1F3D29] pt-2"
+                  className="flex items-center justify-between"
                 >
-                  <span className="text-[14px] font-semibold text-[#F0F7F2]">
+                  <span className="text-sm font-semibold text-[#F0F7F2]">
                     {formatTimeRange(slot.slot_start_at, slot.slot_end_at, timezone)}
                   </span>
                   <span className="font-mono text-[11px] font-normal text-[#4A6B55]">
@@ -67,21 +105,32 @@ export function BookingConfirmation({
               ))}
             </div>
           </div>
-          <div className="flex gap-2.5 rounded-xl border border-[rgba(251,191,36,0.16)] bg-[rgba(251,191,36,0.1)] p-3">
-            <span>⚠️</span>
-            <span className="text-xs font-medium leading-5 text-[#FBBF24]">
-              Screenshot this page. This code won&apos;t appear again. Use it under My Booking to check your status.
+
+          {/* Warning banner */}
+          <div className="flex items-start gap-2.5 rounded-[10px] border border-[rgba(251,191,36,0.2)] bg-[rgba(251,191,36,0.1)] px-3.5 py-[13px]">
+            <span aria-hidden="true">⚠️</span>
+            <span className="text-xs font-medium leading-[1.5] text-[#FBBF24]">
+              Screenshot this screen. This code won&apos;t appear again. Use it under My
+              Booking to check your status.
             </span>
           </div>
         </div>
+
+        {/* Done button - label centered; safe-area spacer below so text isn't pushed up */}
         <button
           type="button"
-          className="mx-5 mb-[34px] rounded-[14px] bg-[#F0F7F2] p-4 text-[15px] font-extrabold text-[#0F2418]"
+          className="flex w-full shrink-0 flex-col bg-[#F0F7F2] transition-opacity duration-[150ms] active:opacity-85"
           onClick={onClose}
         >
-          Got it - I saved the code
+          <span className="flex min-h-[52px] items-center justify-center px-[22px] py-3.5 text-[15px] font-extrabold text-[#0F2418]">
+            Got it, I saved the code
+          </span>
+          <span
+            className="block h-[max(0.5rem,env(safe-area-inset-bottom,0px))] shrink-0 md:hidden"
+            aria-hidden="true"
+          />
         </button>
       </div>
-    </div>
+    </>
   );
 }
