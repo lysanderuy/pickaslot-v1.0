@@ -1,34 +1,173 @@
-import Link from "next/link";
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
+import { Nav } from "@/components/Nav";
+import { LookupForm } from "@/components/lookup/LookupForm";
+import { EmptyState } from "@/components/lookup/EmptyState";
+import { ErrorCard } from "@/components/lookup/ErrorCard";
+import { BookingResult } from "@/components/lookup/BookingResult";
+import type { PublicBookingLookupResult, PaymentMethod } from "@/types/bookings";
+import type { BookingStatus } from "@/components/lookup/StatusBanner";
+
+type LookupState = "idle" | "loading" | "result" | "error";
+
+const CODE_RE = /^[0-9]{4}-[A-Z0-9]{3}$/;
 
 export default function LookupPage() {
   return (
-    <main className="min-h-screen px-6 py-10 sm:px-8 lg:px-12">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-        <header className="space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-stone-500">
-            My Booking
-          </p>
-          <h1 className="text-3xl font-semibold text-stone-950 sm:text-4xl">
-            Booking code lookup shell
-          </h1>
-          <p className="max-w-2xl text-base leading-7 text-stone-700">
-            The actual lookup endpoint will fetch the booking by code from a
-            server-side route backed by Supabase and Postgres.
-          </p>
-          <Link href="/" className="text-sm font-medium text-stone-950 underline">
-            Back to home
-          </Link>
-        </header>
+    <Suspense>
+      <LookupContent />
+    </Suspense>
+  );
+}
 
-        <section className="rounded-[1.5rem] border border-black/10 bg-white/80 p-6 shadow-sm">
-          <label className="block text-sm font-medium text-stone-600" htmlFor="booking-code">
-            Booking code
-          </label>
-          <div className="mt-3 rounded-2xl border border-black/10 bg-stone-50 px-4 py-3 text-sm text-stone-500">
-            Enter the code from your confirmation screen, for example 1234-XK9.
-          </div>
-        </section>
+function LookupContent() {
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code")?.toUpperCase() ?? "";
+
+  const [input, setInput] = useState(code);
+  const [state, setState] = useState<LookupState>(code ? "loading" : "idle");
+  const [booking, setBooking] = useState<PublicBookingLookupResult | null>(null);
+  const [errorTitle, setErrorTitle] = useState("");
+  const [errorSub, setErrorSub] = useState("");
+
+  const [prevCode, setPrevCode] = useState(code);
+
+  if (code !== prevCode) {
+    setPrevCode(code);
+    setInput(code);
+    if (!code) {
+      setState("idle");
+      setBooking(null);
+    } else {
+      setState("loading");
+    }
+  }
+
+  useEffect(() => {
+    if (code) {
+      void doLookup(code);
+    }
+  }, [code]);
+
+  async function doLookup(code: string) {
+    const trimmed = code.trim().toUpperCase();
+
+    if (!trimmed) {
+      setState("idle");
+      return;
+    }
+
+    // Sync browser URL search parameters with the queried code
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("code") !== trimmed) {
+        url.searchParams.set("code", trimmed);
+        window.history.pushState({}, "", url.toString());
+      }
+    }
+
+    if (!CODE_RE.test(trimmed)) {
+      setErrorTitle("Invalid code format");
+      setErrorSub(
+        "Booking codes look like 1234-XK9 — four digits, a dash, then three characters. Double-check and try again."
+      );
+      setState("error");
+      return;
+    }
+
+    setState("loading");
+
+    try {
+      const response = await fetch("/api/bookings/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingCode: trimmed }),
+      });
+      const payload = (await response.json()) as { booking?: PublicBookingLookupResult; error?: string };
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setErrorTitle("Booking not found");
+          setErrorSub(
+            "We couldn't find a booking with that code. Make sure you entered it exactly as shown on your confirmation screen."
+          );
+        } else {
+          setErrorTitle("Lookup failed");
+          setErrorSub(payload.error ?? "Something went wrong. Please try again.");
+        }
+        setState("error");
+        return;
+      }
+
+      if (!payload.booking) {
+        setErrorTitle("Booking not found");
+        setErrorSub("We couldn't find a booking with that code.");
+        setState("error");
+        return;
+      }
+
+      setBooking(payload.booking);
+      setState("result");
+    } catch {
+      setErrorTitle("Lookup failed");
+      setErrorSub("Something went wrong. Please check your connection and try again.");
+      setState("error");
+    }
+  }
+
+  function handleLookup() {
+    void doLookup(input);
+  }
+
+  function handleClear() {
+    setInput("");
+    setState("idle");
+    setBooking(null);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("code")) {
+        url.searchParams.delete("code");
+        window.history.pushState({}, "", url.toString());
+      }
+    }
+  }
+
+  const isLoading = state === "loading";
+
+  return (
+    <div className="flex min-h-[100dvh] w-full flex-col bg-[#0F2418] text-[#F0F7F2] antialiased">
+      <Nav activeTab="lookup" />
+
+      {/* BODY */}
+      <div className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-[560px] pb-16 pt-8">
+          {/* LOOKUP FORM */}
+          <LookupForm value={input} onChange={setInput} onLookup={handleLookup} loading={isLoading} />
+
+          {/* RESULT AREA */}
+          {state === "idle" && <EmptyState />}
+
+          {state === "error" && <ErrorCard title={errorTitle} description={errorSub} />}
+
+          {state === "result" && booking && (
+            <BookingResult
+              status={booking.status as BookingStatus}
+              bookingCode={booking.booking_code}
+              firstName={booking.first_name}
+              slots={booking.slots}
+              paymentMethod={booking.payment_method as PaymentMethod}
+              totalCostCents={booking.total_cost_cents}
+              bookingDate={booking.booking_date}
+              pricePerHourCents={booking.price_per_hour_cents}
+              onClear={handleClear}
+            />
+          )}
+        </div>
       </div>
-    </main>
+
+    </div>
   );
 }
