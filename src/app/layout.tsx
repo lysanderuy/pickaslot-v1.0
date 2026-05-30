@@ -15,8 +15,30 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PickASlot",
-  description: "Pickleball court booking and admin workflow.",
+  title: "PickASlot – Book Your Pickleball Slot",
+  description:
+    "Reserve your court time at Villa Del Rio Pickleball Court. Quick booking, real-time availability, no hassle.",
+  openGraph: {
+    title: "PickASlot – Book Your Pickleball Slot",
+    description:
+      "Reserve your court time at Villa Del Rio Pickleball Court. Quick booking, real-time availability, no hassle.",
+    siteName: "PickASlot",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PickASlot – Book Your Pickleball Slot",
+    description:
+      "Reserve your court time at Villa Del Rio Pickleball Court. Quick booking, real-time availability, no hassle.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
