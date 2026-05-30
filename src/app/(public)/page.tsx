@@ -18,6 +18,7 @@ import { ReserveBar } from "@/components/booking/ReserveBar";
 import { BookingSheet } from "@/components/booking/BookingSheet";
 import { BookingConfirmation } from "@/components/booking/BookingConfirmation";
 import { WarningModal } from "@/components/booking/WarningModal";
+import { BookPageSkeleton } from "@/components/booking/BookPageSkeleton";
 import type {
   Court,
   AvailabilityRow,
@@ -238,11 +239,7 @@ export default function BookPage() {
     return (
       <div className="flex min-h-[100dvh] w-full flex-col bg-[#0F2418] text-[#F0F7F2] antialiased">
         <Nav activeTab="book" />
-        <div className="flex flex-1 items-center justify-center p-6">
-          <div className={cx(cardClass, "w-full max-w-sm rounded-[18px] p-6 text-center text-sm font-medium text-[#8AAF95]")}>
-            Loading court details...
-          </div>
-        </div>
+        <BookPageSkeleton />
       </div>
     );
   }

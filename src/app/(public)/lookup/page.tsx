@@ -8,6 +8,7 @@ import { LookupForm } from "@/components/lookup/LookupForm";
 import { EmptyState } from "@/components/lookup/EmptyState";
 import { ErrorCard } from "@/components/lookup/ErrorCard";
 import { BookingResult } from "@/components/lookup/BookingResult";
+import { LookupResultSkeleton } from "@/components/lookup/LookupResultSkeleton";
 import type { PublicBookingLookupResult, PaymentMethod } from "@/types/bookings";
 import type { BookingStatus } from "@/components/lookup/StatusBanner";
 
@@ -148,6 +149,8 @@ function LookupContent() {
           <LookupForm value={input} onChange={setInput} onLookup={handleLookup} loading={isLoading} />
 
           {/* RESULT AREA */}
+          {state === "loading" && <LookupResultSkeleton />}
+
           {state === "idle" && <EmptyState />}
 
           {state === "error" && <ErrorCard title={errorTitle} description={errorSub} />}
