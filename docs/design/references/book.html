@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Pikbol — Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --base:     #0F2418;
+  --card:     #162E20;
+  --elevated: #1C3828;
+  --border:   #2A4A35;
+  --border2:  #1F3D29;
+
+  --txt1: #F0F7F2;
+  --txt2: #8AAF95;
+  --txt3: #4A6B55;
+  --txt4: #2E4D38;
+
+  --avail:      #4ADE80;
+  --avail-dim:  rgba(74,222,128,.12);
+  --avail-card: #172E20;
+
+  --taken:      #F87171;
+  --taken-dim:  rgba(248,113,113,.1);
+
+  --pend:       #FBBF24;
+  --pend-dim:   rgba(251,191,36,.1);
+
+  --accent:     #F0F7F2;
+  --accent-dim: rgba(240,247,242,.08);
+
+  --sans: 'Plus Jakarta Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+html,body{
+  height:100%;
+  background:var(--base);
+  font-family:var(--sans);
+  color:var(--txt1);
+  -webkit-font-smoothing:antialiased;
+}
+.shell{
+  max-width:430px;margin:0 auto;
+  min-height:100dvh;
+  display:flex;flex-direction:column;
+  background:var(--base);
+}
+
+/* ─── NAV ─── */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 0;
+  position:sticky;top:0;z-index:40;
+  background:var(--base);
+}
+.nav-brand{
+  font-size:18px;font-weight:800;
+  letter-spacing:-.02em;color:var(--txt1);
+}
+.nav-brand em{color:var(--avail);font-style:normal;}
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{
+  padding:7px 14px;
+  border:none;background:none;
+  font-family:var(--sans);font-size:12px;font-weight:600;
+  letter-spacing:.04em;
+  color:var(--txt3);cursor:pointer;
+  border-radius:20px;
+  transition:all .18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-tab.active{
+  background:var(--elevated);
+  color:var(--txt1);
+}
+
+/* ─── BODY ─── */
+.body{
+  flex:1;overflow-y:auto;
+  padding:0 0 200px;
+}
+.body::-webkit-scrollbar{display:none;}
+
+/* ─── SECTION 1: COURT HERO ─── */
+.hero{
+  margin:16px 16px 0;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  position:relative;
+  overflow:hidden;
+}
+/* subtle court line texture */
+.hero::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg, transparent 49.5%, var(--border2) 49.5%, var(--border2) 50.5%, transparent 50.5%),
+    linear-gradient(0deg, transparent 69%, var(--border2) 69%, var(--border2) 70%, transparent 70%),
+    linear-gradient(0deg, transparent 29%, var(--border2) 29%, var(--border2) 30%, transparent 30%);
+  opacity:.5;
+  pointer-events:none;
+}
+.hero-content{position:relative;z-index:1;}
+.hero-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:16px;
+}
+.hero-name{
+  font-size:22px;font-weight:800;
+  color:var(--txt1);letter-spacing:-.02em;
+  line-height:1.1;
+}
+.hero-location{
+  font-size:12px;font-weight:500;
+  color:var(--txt2);margin-top:4px;
+  display:flex;align-items:center;gap:5px;
+}
+.hero-status{
+  display:flex;align-items:center;gap:7px;
+  background:var(--avail-dim);
+  border:1px solid rgba(74,222,128,.2);
+  border-radius:20px;
+  padding:6px 12px;
+  flex-shrink:0;
+}
+.hero-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--avail);
+  box-shadow:0 0 8px rgba(74,222,128,.6);
+}
+.hero-status-txt{
+  font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--avail);
+}
+.hero-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:16px;
+  border-top:1px solid var(--border);
+}
+.hero-stat{display:flex;flex-direction:column;gap:2px;}
+.hero-stat-label{
+  font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);
+}
+.hero-stat-value{
+  font-size:17px;font-weight:800;
+  color:var(--txt1);letter-spacing:-.02em;
+}
+.hero-stat-value em{
+  font-style:normal;color:var(--avail);
+}
+.hero-divider{
+  width:1px;height:32px;background:var(--border);
+}
+
+/* ─── SECTION WRAPPER ─── */
+.section{padding:24px 16px 0;}
+.sec-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sec-label-right{
+  font-family:var(--mono);
+  font-size:11px;font-weight:400;
+  color:var(--txt3);letter-spacing:.02em;
+  text-transform:none;
+}
+
+/* ─── SECTION 2: DATE PICKER ─── */
+.date-trigger{
+  width:100%;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+  transition:all .16s;
+  -webkit-tap-highlight-color:transparent;
+  gap:12px;
+}
+.date-trigger:active{background:var(--elevated);}
+.date-trigger.open{
+  border-color:var(--avail);
+  border-radius:14px 14px 0 0;
+  border-bottom-color:transparent;
+}
+.dt-left{display:flex;align-items:center;gap:12px;}
+.dt-icon{
+  width:38px;height:38px;
+  background:var(--avail-dim);
+  border:1px solid rgba(74,222,128,.15);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.dt-main{
+  font-size:16px;font-weight:700;
+  color:var(--txt1);letter-spacing:-.01em;line-height:1;
+}
+.dt-sub{
+  font-size:11px;font-weight:500;
+  color:var(--txt2);margin-top:3px;
+}
+.dt-right{display:flex;align-items:center;gap:8px;}
+.dt-change{
+  font-size:11px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  color:var(--avail);
+}
+.dt-chev{
+  width:22px;height:22px;
+  background:var(--avail-dim);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .25s;
+}
+.dt-chev.open{transform:rotate(180deg);}
+
+/* calendar */
+.cal-panel{
+  background:var(--card);
+  border:1px solid var(--avail);
+  border-top:none;border-radius:0 0 14px 14px;
+  overflow:hidden;max-height:0;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.cal-panel.open{max-height:320px;pointer-events:all;}
+.cal-inner{padding:14px 16px 16px;}
+.cal-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.cal-nav-m{
+  font-size:13px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--txt1);
+}
+.cal-btn{
+  width:28px;height:28px;
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .13s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cal-btn:active{background:var(--border);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-dow{
+  text-align:center;font-size:9px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--txt3);padding-bottom:6px;
+}
+.cal-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:7px;font-size:13px;font-weight:500;
+  color:var(--txt2);cursor:pointer;transition:all .13s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cal-day:hover:not(.cd-dis):not(.cd-sel){background:var(--elevated);}
+.cal-day.cd-today{font-weight:800;color:var(--avail);}
+.cal-day.cd-sel{background:var(--avail);color:var(--base);font-weight:700;}
+.cal-day.cd-other{color:var(--txt4);}
+.cal-day.cd-dis{color:var(--txt4);cursor:default;}
+
+/* week strip */
+.week-strip{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:5px;margin-top:6px;
+}
+.wd-card{
+  display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:8px 4px 7px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  cursor:pointer;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.wd-card:active:not(.wd-dis){background:var(--elevated);transform:scale(.95);}
+.wd-card.wd-active{
+  background:var(--avail);
+  border-color:var(--avail);
+  box-shadow:0 3px 14px rgba(74,222,128,.25);
+}
+.wd-card.wd-today:not(.wd-active){
+  border-color:rgba(74,222,128,.3);
+}
+.wd-card.wd-dis{opacity:.3;cursor:default;}
+.wd-n{
+  font-size:9px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--txt3);line-height:1;
+}
+.wd-card.wd-active .wd-n{color:rgba(15,36,24,.65);}
+.wd-card.wd-today:not(.wd-active) .wd-n{color:var(--avail);}
+.wd-d{
+  font-size:16px;font-weight:700;
+  color:var(--txt2);line-height:1;
+}
+.wd-card.wd-active .wd-d{color:var(--base);font-weight:800;}
+.wd-card.wd-today:not(.wd-active) .wd-d{color:var(--avail);}
+.wd-pip{width:4px;height:4px;border-radius:50%;background:transparent;}
+.wd-card.wd-has .wd-pip{background:var(--border);}
+.wd-card.wd-active .wd-pip{background:rgba(15,36,24,.3);}
+
+/* ─── SECTION 3: SLOT GRID ─── */
+.slot-hint{
+  font-size:12px;font-weight:500;
+  color:var(--txt3);font-style:italic;
+  margin-bottom:12px;
+}
+.slot-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+/* SLOT CARD */
+.slot-card{
+  border-radius:14px;
+  padding:11px 12px 10px;
+  display:flex;flex-direction:column;
+  gap:5px;
+  transition:all .15s ease;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+  overflow:hidden;
+}
+
+/* available — elevated, tappable */
+.sc-available{
+  background:var(--elevated);
+  border:1px solid var(--border);
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.2), 0 1px 2px rgba(0,0,0,.15);
+}
+.sc-available:active{
+  transform:scale(.96);
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+
+/* selected */
+.sc-selected{
+  background:var(--avail);
+  border:1px solid var(--avail);
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(74,222,128,.3);
+}
+.sc-selected:active{transform:scale(.96);}
+
+/* taken */
+.sc-taken{
+  background:var(--taken-dim);
+  border:1px solid rgba(248,113,113,.15);
+  cursor:default;
+  opacity:.7;
+}
+
+/* pending */
+.sc-pending{
+  background:var(--pend-dim);
+  border:1px solid rgba(251,191,36,.15);
+  cursor:default;
+}
+
+/* past */
+.sc-past{
+  background:transparent;
+  border:1px solid var(--border2);
+  cursor:default;
+  opacity:.35;
+}
+
+/* card inner */
+.sc-time{
+  font-size:16px;font-weight:800;
+  letter-spacing:-.02em;line-height:1;
+  color:var(--txt1);
+  transition:color .15s;
+  white-space:nowrap;
+}
+.sc-ampm{
+  font-size:12px;font-weight:600;
+  opacity:.7;
+}
+.sc-available .sc-time{color:var(--txt1);}
+.sc-selected  .sc-time{color:var(--base);}
+.sc-taken     .sc-time{color:var(--taken);}
+.sc-pending   .sc-time{color:var(--pend);}
+.sc-past      .sc-time{color:var(--txt3);}
+
+.sc-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:1px;
+}
+.sc-status{
+  font-size:10px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  transition:color .15s;
+}
+.sc-available .sc-status{color:var(--avail);}
+.sc-selected  .sc-status{color:rgba(15,36,24,.7);}
+.sc-taken     .sc-status{color:var(--taken);}
+.sc-pending   .sc-status{color:var(--pend);}
+.sc-past      .sc-status{color:var(--txt4);}
+
+.sc-check{
+  width:20px;height:20px;border-radius:50%;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);
+  transition:all .15s;flex-shrink:0;
+}
+.sc-available .sc-check{border-color:var(--border);}
+.sc-selected  .sc-check{
+  background:rgba(15,36,24,.25);
+  border-color:rgba(15,36,24,.3);
+}
+.sc-check svg{opacity:0;transition:opacity .15s;}
+.sc-selected .sc-check svg{opacity:1;}
+
+/* slot stagger */
+@keyframes slotIn{
+  from{opacity:0;transform:scale(.94);}
+  to{opacity:1;transform:scale(1);}
+}
+.slot-card{animation:slotIn .2s ease both;}
+.slot-card:nth-child(1){animation-delay:.03s;}
+.slot-card:nth-child(2){animation-delay:.06s;}
+.slot-card:nth-child(3){animation-delay:.09s;}
+.slot-card:nth-child(4){animation-delay:.12s;}
+.slot-card:nth-child(5){animation-delay:.15s;}
+.slot-card:nth-child(6){animation-delay:.18s;}
+.slot-card:nth-child(7){animation-delay:.21s;}
+.slot-card:nth-child(8){animation-delay:.24s;}
+.slot-card:nth-child(9){animation-delay:.27s;}
+.slot-card:nth-child(10){animation-delay:.30s;}
+.slot-card:nth-child(11){animation-delay:.33s;}
+.slot-card:nth-child(12){animation-delay:.36s;}
+.slot-card:nth-child(13){animation-delay:.39s;}
+.slot-card:nth-child(14){animation-delay:.42s;}
+.slot-card:nth-child(15){animation-delay:.45s;}
+.slot-card:nth-child(16){animation-delay:.48s;}
+
+/* ─── SECTION 4: RESERVATIONS ─── */
+.res-list{display:flex;flex-direction:column;gap:6px;}
+.res-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:13px 16px;
+  display:flex;align-items:center;gap:14px;
+}
+.res-time-block{flex:1;min-width:0;}
+.res-time{
+  font-size:14px;font-weight:700;
+  color:var(--txt1);letter-spacing:-.01em;
+  line-height:1;
+}
+.res-name{
+  font-size:12px;font-weight:500;
+  color:var(--txt2);margin-top:3px;font-style:italic;
+}
+.res-right{
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+  flex-shrink:0;
+}
+.res-duration{
+  font-family:var(--mono);
+  font-size:11px;color:var(--txt3);
+}
+.res-cost{
+  font-size:13px;font-weight:700;
+  color:var(--txt1);letter-spacing:-.01em;
+}
+.res-empty{
+  background:var(--card);
+  border:1px dashed var(--border);
+  border-radius:12px;
+  padding:20px 16px;
+  text-align:center;
+  font-size:13px;font-weight:500;
+  color:var(--txt3);font-style:italic;
+}
+
+/* ─── SECTION 5: COURT INFO ─── */
+.ci-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+}
+.ci-trigger{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 16px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .13s;
+}
+.ci-trigger:active{background:var(--elevated);}
+.ci-trigger-left{display:flex;align-items:center;gap:12px;}
+.ci-icon{
+  width:36px;height:36px;
+  background:var(--avail-dim);
+  border:1px solid rgba(74,222,128,.15);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:16px;
+}
+.ci-name{
+  font-size:15px;font-weight:700;
+  color:var(--txt1);letter-spacing:-.01em;
+}
+.ci-hint{font-size:11px;font-weight:500;color:var(--txt3);margin-top:2px;}
+.ci-chev{
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .25s;
+}
+.ci-chev.open{transform:rotate(180deg);}
+.ci-body{
+  overflow:hidden;max-height:0;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1);
+}
+.ci-body.open{max-height:600px;}
+.ci-inner{padding:0 16px 16px;border-top:1px solid var(--border);}
+.ci-row{
+  display:flex;gap:12px;
+  padding:13px 0;border-bottom:1px solid var(--border2);
+}
+.ci-row:last-child{border-bottom:none;}
+.ci-row-icon{
+  width:30px;height:30px;
+  background:var(--elevated);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;font-size:14px;
+}
+.ci-row-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:4px;
+}
+.ci-row-value{
+  font-size:13px;font-weight:500;
+  color:var(--txt2);line-height:1.55;
+}
+.ci-row-value strong{font-weight:700;color:var(--txt1);}
+.rules-list{display:flex;flex-direction:column;gap:6px;margin-top:2px;}
+.rule-item{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:12px;font-weight:500;color:var(--txt2);line-height:1.5;
+}
+.rule-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--avail);flex-shrink:0;margin-top:5px;
+  opacity:.6;
+}
+
+/* ─── RESERVE BAR ─── */
+.res-bar{
+  position:fixed;bottom:0;left:50%;
+  transform:translateX(-50%) translateY(110%);
+  width:100%;max-width:430px;
+  padding:12px 16px 36px;
+  background:linear-gradient(to top,var(--base) 55%,transparent);
+  z-index:50;
+  transition:transform .3s cubic-bezier(.32,.72,0,1);
+  pointer-events:none;
+}
+.res-bar.up{transform:translateX(-50%) translateY(0);pointer-events:all;}
+.res-btn{
+  width:100%;
+  background:var(--accent);
+  border:none;border-radius:14px;
+  padding:17px 22px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+  box-shadow:0 8px 32px rgba(240,247,242,.15),0 2px 8px rgba(0,0,0,.3);
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.res-btn:active{transform:scale(.98);opacity:.9;}
+.rb-l{display:flex;flex-direction:column;gap:2px;}
+.rb-label{
+  font-family:var(--sans);
+  font-size:15px;font-weight:800;
+  color:var(--base);letter-spacing:-.01em;
+}
+.rb-sub{
+  font-family:var(--mono);font-size:11px;
+  color:rgba(15,36,24,.5);
+}
+.rb-r{display:flex;align-items:center;gap:10px;}
+.rb-price{
+  font-size:22px;font-weight:800;
+  color:var(--base);letter-spacing:-.02em;line-height:1;
+}
+.rb-arrow{
+  width:34px;height:34px;
+  background:rgba(15,36,24,.12);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ─── OVERLAY ─── */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(5,14,9,.7);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:100;opacity:0;pointer-events:none;
+  transition:opacity .22s;
+}
+.overlay.show{opacity:1;pointer-events:all;}
+
+/* ─── BOOKING SHEET ─── */
+.sheet{
+  position:fixed;bottom:0;left:50%;
+  transform:translateX(-50%) translateY(104%);
+  width:100%;max-width:430px;
+  background:var(--card);
+  border-radius:22px 22px 0 0;
+  z-index:101;max-height:93dvh;overflow-y:auto;
+  transition:transform .32s cubic-bezier(.32,.72,0,1);
+  border-top:2px solid var(--avail);
+}
+.sheet::-webkit-scrollbar{display:none;}
+.sheet.show{transform:translateX(-50%) translateY(0);}
+.sheet-pad{padding:0 20px 52px;}
+.sheet-pull{
+  width:36px;height:4px;background:var(--border);
+  border-radius:2px;margin:14px auto 22px;
+}
+.sheet-title{
+  font-size:24px;font-weight:800;
+  color:var(--txt1);letter-spacing:-.02em;margin-bottom:4px;
+}
+.sheet-sub{font-size:13px;color:var(--txt2);font-style:italic;margin-bottom:22px;}
+
+.sum-box{
+  background:var(--elevated);
+  border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;margin-bottom:24px;
+}
+.sum-head{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:10px;
+}
+.sum-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--border2);
+}
+.sum-row:last-of-type{border-bottom:none;}
+.sum-t{font-size:14px;font-weight:600;color:var(--txt1);}
+.sum-p{font-family:var(--mono);font-size:12px;color:var(--txt2);}
+.sum-total{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:11px;margin-top:6px;
+  border-top:1px solid var(--border);
+}
+.sum-tl{
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);
+}
+.sum-tv{font-size:22px;font-weight:800;color:var(--avail);letter-spacing:-.02em;}
+
+.fg{margin-bottom:20px;}
+.fl{
+  display:block;font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt2);margin-bottom:8px;
+}
+.fi{
+  width:100%;padding:14px 16px;
+  background:var(--elevated);
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-family:var(--sans);font-size:16px;font-weight:500;
+  color:var(--txt1);outline:none;transition:all .18s;
+}
+.fi:focus{border-color:var(--avail);box-shadow:0 0 0 3px rgba(74,222,128,.1);}
+.fi::placeholder{color:var(--txt3);}
+
+.pay-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pay-opt{
+  padding:13px 14px;
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:10px;
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.pay-opt.sel{
+  border-color:var(--avail);
+  box-shadow:0 0 0 1px var(--avail);
+  background:var(--avail-dim);
+}
+.pay-icon{font-size:20px;line-height:1;}
+.pay-lbl{font-size:14px;font-weight:600;color:var(--txt2);}
+.pay-opt.sel .pay-lbl{color:var(--avail);}
+
+.sub-btn{
+  width:100%;margin-top:26px;padding:16px;
+  background:var(--accent);color:var(--base);
+  border:none;border-radius:12px;
+  font-family:var(--sans);font-size:15px;font-weight:800;
+  letter-spacing:-.01em;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(240,247,242,.12);
+  transition:all .15s;
+}
+.sub-btn:active{transform:scale(.98);opacity:.9;}
+
+/* ─── CONFIRM SCREEN ─── */
+.cs{
+  position:fixed;inset:0;background:var(--base);
+  z-index:200;display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;
+  transform:translateY(20px);
+  transition:all .32s cubic-bezier(.32,.72,0,1);
+  max-width:430px;left:50%;margin-left:-215px;
+}
+@media(max-width:430px){.cs{left:0;margin-left:0;}}
+.cs.show{opacity:1;pointer-events:all;transform:translateY(0);}
+
+.cs-top{
+  padding:52px 22px 28px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.cs-eyebrow{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:8px;
+}
+.cs-title{
+  font-size:32px;font-weight:800;
+  color:var(--txt1);letter-spacing:-.03em;
+  line-height:1.1;margin-bottom:6px;
+}
+.cs-title em{color:var(--avail);font-style:normal;}
+.cs-sub{font-size:13px;color:var(--txt2);line-height:1.6;}
+
+.cs-body{
+  flex:1;overflow-y:auto;
+  padding:24px 22px 0;
+  display:flex;flex-direction:column;
+}
+.cs-body::-webkit-scrollbar{display:none;}
+
+.code-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px 18px;
+  margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.code-card::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--avail),transparent);
+}
+.cc-lbl{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:10px;
+}
+.cc-code{
+  font-family:var(--mono);
+  font-size:42px;font-weight:500;
+  color:var(--avail);letter-spacing:.06em;
+  line-height:1;margin-bottom:16px;
+}
+.cc-slots{
+  display:flex;flex-direction:column;gap:7px;
+  padding-top:13px;border-top:1px solid var(--border);
+}
+.cc-slot{display:flex;justify-content:space-between;align-items:center;}
+.cc-slot-t{font-size:14px;font-weight:600;color:var(--txt1);}
+.cc-slot-d{font-family:var(--mono);font-size:11px;color:var(--txt3);}
+
+.cs-warn{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--pend-dim);
+  border:1px solid rgba(251,191,36,.2);
+  border-radius:10px;padding:13px 14px;margin-bottom:24px;
+}
+.cs-warn-txt{font-size:12px;font-weight:500;color:var(--pend);line-height:1.5;}
+
+.cs-done{
+  width:100%;padding:16px 22px 44px;
+  background:var(--accent);color:var(--base);
+  border:none;
+  font-family:var(--sans);font-size:15px;font-weight:800;
+  cursor:pointer;transition:opacity .15s;
+  margin-top:auto;flex-shrink:0;
+}
+.cs-done:active{opacity:.85;}
+
+/* ─── WARN MODAL ─── */
+.wov{
+  position:fixed;inset:0;
+  background:rgba(5,14,9,.75);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:300;display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.wov.show{opacity:1;pointer-events:all;}
+.wbox{
+  background:var(--card);
+  border-top:2px solid var(--pend);
+  border-radius:22px 22px 0 0;
+  padding:24px 20px 44px;width:100%;max-width:430px;
+  transform:translateY(30px);
+  transition:transform .26s cubic-bezier(.32,.72,0,1);
+}
+.wov.show .wbox{transform:translateY(0);}
+.w-title{
+  font-size:20px;font-weight:800;
+  color:var(--txt1);letter-spacing:-.02em;margin-bottom:8px;
+}
+.w-body{font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:22px;}
+.w-acts{display:flex;gap:10px;}
+.w-btn{
+  flex:1;padding:14px;border:none;
+  font-family:var(--sans);font-size:13px;font-weight:700;
+  cursor:pointer;border-radius:10px;transition:opacity .13s;letter-spacing:-.01em;
+}
+.w-btn:active{opacity:.8;}
+.w-back{background:var(--elevated);color:var(--txt2);border:1px solid var(--border);}
+.w-go{background:var(--pend);color:var(--base);}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="nav-brand">Pik<em>bol</em></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab(0)">Book</button>
+      <button class="nav-tab" onclick="switchTab(1)">My Booking</button>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- S1: COURT HERO -->
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-top">
+          <div>
+            <div class="hero-name">Sunrise Court</div>
+            <div class="hero-location">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 1C4.07 1 2.5 2.57 2.5 4.5c0 2.625 3.5 6.5 3.5 6.5s3.5-3.875 3.5-6.5C9.5 2.57 7.93 1 6 1z" stroke="var(--txt3)" stroke-width="1.2"/>
+                <circle cx="6" cy="4.5" r="1.2" stroke="var(--txt3)" stroke-width="1.2"/>
+              </svg>
+              Block 4, Sunrise Village
+            </div>
+          </div>
+          <div class="hero-status">
+            <div class="hero-dot"></div>
+            <span class="hero-status-txt">Open</span>
+          </div>
+        </div>
+        <div class="hero-bottom">
+          <div class="hero-stat">
+            <span class="hero-stat-label">Rate</span>
+            <span class="hero-stat-value">₱150 <em>/ hr</em></span>
+          </div>
+          <div class="hero-divider"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-label">Hours</span>
+            <span class="hero-stat-value">6AM – 10PM</span>
+          </div>
+          <div class="hero-divider"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-label">Slots Today</span>
+            <span class="hero-stat-value" id="heroOpenCount">— <em>open</em></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2: DATE PICKER -->
+    <div class="section">
+      <div class="sec-label">Pick a Date</div>
+      <div class="date-trigger" id="dateTrigger" onclick="toggleCal()">
+        <div class="dt-left">
+          <div class="dt-icon">
+            <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+              <rect x="2" y="3" width="14" height="13" rx="2.5" stroke="var(--avail)" stroke-width="1.5"/>
+              <path d="M2 7h14" stroke="var(--avail)" stroke-width="1.5"/>
+              <path d="M6 1v3M12 1v3" stroke="var(--avail)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="dt-main" id="dtMain">—</div>
+            <div class="dt-sub" id="dtSub">—</div>
+          </div>
+        </div>
+        <div class="dt-right">
+          <span class="dt-change">Change</span>
+          <div class="dt-chev" id="dtChev">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4l4 4 4-4" stroke="var(--avail)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="cal-panel" id="calPanel">
+        <div class="cal-inner">
+          <div class="cal-nav">
+            <button class="cal-btn" onclick="shiftM(-1)">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M7 2L4 5.5l3 3.5" stroke="var(--txt2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span class="cal-nav-m" id="calNavM"></span>
+            <button class="cal-btn" onclick="shiftM(1)">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M4 2l3 3.5-3 3.5" stroke="var(--txt2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+      </div>
+
+      <div class="week-strip" id="weekStrip"></div>
+    </div>
+
+    <!-- S3: SLOT GRID -->
+    <div class="section">
+      <div class="sec-label">
+        <span>Choose Your Slot</span>
+        <span class="sec-label-right" id="openCount">—</span>
+      </div>
+      <div class="slot-hint">Tap a slot to select it.</div>
+      <div class="slot-grid" id="slotGrid"></div>
+    </div>
+
+    <!-- S4: RESERVATIONS TODAY -->
+    <div class="section">
+      <div class="sec-label">Reservations Today</div>
+      <div id="resToday"></div>
+    </div>
+
+    <!-- S5: COURT INFO -->
+    <div class="section">
+      <div class="sec-label">Court Info</div>
+      <div class="ci-card">
+        <div class="ci-trigger" onclick="toggleCI()">
+          <div class="ci-trigger-left">
+            <div class="ci-icon">🏓</div>
+            <div>
+              <div class="ci-name">Sunrise Court</div>
+              <div class="ci-hint">Rules, rates & payment details</div>
+            </div>
+          </div>
+          <div class="ci-chev" id="ciChev">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M3 5l4 4 4-4" stroke="var(--txt3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ci-body" id="ciBody">
+          <div class="ci-inner">
+            <div class="ci-row">
+              <div class="ci-row-icon">📍</div>
+              <div>
+                <div class="ci-row-label">Location</div>
+                <div class="ci-row-value">Block 4, Sunrise Village Subdivision<br>Behind the clubhouse</div>
+              </div>
+            </div>
+            <div class="ci-row">
+              <div class="ci-row-icon">💰</div>
+              <div>
+                <div class="ci-row-label">Rate</div>
+                <div class="ci-row-value"><strong>₱150 per hour</strong> · No extensions</div>
+              </div>
+            </div>
+            <div class="ci-row">
+              <div class="ci-row-icon">💳</div>
+              <div>
+                <div class="ci-row-label">Payment</div>
+                <div class="ci-row-value">GCash: <strong>09XX XXX XXXX</strong><br>Cash accepted at the gate.</div>
+              </div>
+            </div>
+            <div class="ci-row">
+              <div class="ci-row-icon">📋</div>
+              <div>
+                <div class="ci-row-label">House Rules</div>
+                <div class="rules-list">
+                  <div class="rule-item"><div class="rule-dot"></div>No booking transfers or slot sharing.</div>
+                  <div class="rule-item"><div class="rule-dot"></div>Arrive on time. Unused time is forfeited.</div>
+                  <div class="rule-item"><div class="rule-dot"></div>Proper court shoes required.</div>
+                  <div class="rule-item"><div class="rule-dot"></div>Clean up after your session.</div>
+                  <div class="rule-item"><div class="rule-dot"></div>Respect other players and residents.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="height:8px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RESERVE BAR -->
+<div class="res-bar" id="resBar">
+  <button class="res-btn" onclick="openSheet()">
+    <div class="rb-l">
+      <span class="rb-label">Reserve Court</span>
+      <span class="rb-sub" id="rbSub">0 slots selected</span>
+    </div>
+    <div class="rb-r">
+      <span class="rb-price" id="rbPrice">₱0</span>
+      <div class="rb-arrow">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="var(--base)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </button>
+</div>
+
+<!-- SHEET -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-pad">
+    <div class="sheet-pull"></div>
+    <div class="sheet-title">Reserve Court</div>
+    <div class="sheet-sub">Fill in your details to submit a booking request.</div>
+    <div class="sum-box">
+      <div class="sum-head">Your Selection</div>
+      <div id="sumRows"></div>
+      <div class="sum-total">
+        <span class="sum-tl">Estimated Total</span>
+        <span class="sum-tv" id="sumTotal">₱0</span>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">First Name</label>
+      <input class="fi" id="fName" type="text" placeholder="e.g. Maria" autocomplete="off"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Contact Number</label>
+      <input class="fi" id="fPhone" type="tel" placeholder="09XX XXX XXXX" autocomplete="off"/>
+    </div>
+    <div class="fg">
+      <label class="fl">Payment Method</label>
+      <div class="pay-row">
+        <div class="pay-opt sel" id="payG" onclick="setPay('gcash')">
+          <span class="pay-icon">💳</span><span class="pay-lbl">GCash</span>
+        </div>
+        <div class="pay-opt" id="payC" onclick="setPay('cash')">
+          <span class="pay-icon">💵</span><span class="pay-lbl">Cash</span>
+        </div>
+      </div>
+    </div>
+    <button class="sub-btn" onclick="submitBooking()">Submit Booking Request</button>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="cs" id="cs">
+  <div class="cs-top">
+    <div class="cs-eyebrow">Booking Requested</div>
+    <div class="cs-title">You're on<br>the <em>queue.</em></div>
+    <div class="cs-sub">Admin will confirm shortly. Save your booking code — you'll need it to check your status.</div>
+  </div>
+  <div class="cs-body">
+    <div style="height:4px;"></div>
+    <div class="code-card">
+      <div class="cc-lbl">Your Booking Code</div>
+      <div class="cc-code" id="csCode">—</div>
+      <div class="cc-slots" id="csSlots"></div>
+    </div>
+    <div class="cs-warn">
+      <span>⚠️</span>
+      <span class="cs-warn-txt">Screenshot this screen. This code won't appear again. Use it under My Booking to check your status.</span>
+    </div>
+    <div style="flex:1;min-height:12px;"></div>
+  </div>
+  <button class="cs-done" onclick="doneCs()">Got it — I saved the code</button>
+</div>
+
+<!-- WARN -->
+<div class="wov" id="wov">
+  <div class="wbox">
+    <div class="w-title">Heads up.</div>
+    <div class="w-body">One or more selected slots begins within the next 60 minutes. Make sure you can get to the court in time.</div>
+    <div class="w-acts">
+      <button class="w-btn w-back" onclick="closeWarn()">Go Back</button>
+      <button class="w-btn w-go" onclick="proceedAnyway()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const OPEN=6,CLOSE=22,PRICE=150;
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+let today=new Date();today.setHours(0,0,0,0);
+let sel=new Date(today);
+let calY=today.getFullYear(),calM=today.getMonth();
+let calOpen=false,ciOpen=false;
+let selSlots=new Set();
+let pay='gcash';
+
+const mock=[3,3,3,3,1,2,1,0,0,0,0,0,1,2,0,0];
+function getSt(date,i){
+  const isT=date.getTime()===today.getTime();
+  if(!isT){const s=(date.getDate()*7+i*3)%10;if(s<2)return'taken';if(s===2)return'pending';return'available';}
+  return['available','taken','pending','past'][mock[i]];
+}
+function fmtH(h){const s=h<12?'AM':'PM';const d=h>12?h-12:h===0?12:h;return{n:`${d}:00`,s};}
+function fmtHStr(h){const{n,s}=fmtH(h);return`${n} ${s}`;}
+function getWeekNum(d){
+  const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7));
+  const y=new Date(Date.UTC(dt.getUTCFullYear(),0,1));
+  return Math.ceil((((dt-y)/86400000)+1)/7);
+}
+
+function updDate(){
+  const isToday=sel.getTime()===today.getTime();
+  const isTmr=sel.getTime()===today.getTime()+86400000;
+  const pre=isToday?'Today':isTmr?'Tomorrow':DAYS[sel.getDay()];
+  document.getElementById('dtMain').textContent=`${pre}, ${MONTHS_S[sel.getMonth()]} ${sel.getDate()}`;
+  document.getElementById('dtSub').textContent=`${DAYS[sel.getDay()]} · Week ${getWeekNum(sel)}`;
+}
+
+function toggleCal(){
+  calOpen=!calOpen;
+  document.getElementById('dateTrigger').classList.toggle('open',calOpen);
+  document.getElementById('calPanel').classList.toggle('open',calOpen);
+  document.getElementById('dtChev').classList.toggle('open',calOpen);
+  if(calOpen){calY=sel.getFullYear();calM=sel.getMonth();buildCal();}
+}
+function buildCal(){
+  document.getElementById('calNavM').textContent=`${MONTHS[calM]} ${calY}`;
+  const g=document.getElementById('calGrid');g.innerHTML='';
+  DAYS_S.forEach(d=>{const e=document.createElement('div');e.className='cal-dow';e.textContent=d[0];g.appendChild(e);});
+  const first=new Date(calY,calM,1).getDay();
+  const dim=new Date(calY,calM+1,0).getDate();
+  const dprev=new Date(calY,calM,0).getDate();
+  for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cal-day cd-other';e.textContent=dprev-first+1+i;g.appendChild(e);}
+  for(let d=1;d<=dim;d++){
+    const e=document.createElement('div');
+    const dt=new Date(calY,calM,d);
+    const isT=dt.getTime()===today.getTime();
+    const isS=dt.getTime()===sel.getTime();
+    const isPast=dt<today;
+    e.className='cal-day'+(isT?' cd-today':'')+(isS?' cd-sel':'')+(isPast?' cd-dis':'');
+    e.textContent=d;
+    if(!isPast)e.onclick=()=>{pickDate(new Date(dt));if(calOpen)toggleCal();};
+    g.appendChild(e);
+  }
+}
+function shiftM(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}buildCal();}
+
+function wsStart(d){const r=new Date(d);r.setDate(r.getDate()-r.getDay());r.setHours(0,0,0,0);return r;}
+function buildWS(){
+  const s=document.getElementById('weekStrip');s.innerHTML='';
+  const ws=wsStart(sel);
+  for(let i=0;i<7;i++){
+    const d=new Date(ws);d.setDate(ws.getDate()+i);
+    const isA=d.getTime()===sel.getTime();
+    const isT=d.getTime()===today.getTime();
+    const isPast=d<today;
+    const e=document.createElement('div');
+    let cls='wd-card';
+    if(isA)cls+=' wd-active';
+    else if(isT)cls+=' wd-today';
+    if(!isPast&&!isA)cls+=' wd-has';
+    if(isPast)cls+=' wd-dis';
+    e.className=cls;
+    e.innerHTML=`<span class="wd-n">${DAYS_S[d.getDay()]}</span><span class="wd-d">${d.getDate()}</span><div class="wd-pip"></div>`;
+    if(!isPast)e.onclick=()=>pickDate(new Date(d));
+    s.appendChild(e);
+  }
+}
+
+function pickDate(d){
+  sel=new Date(d);sel.setHours(0,0,0,0);
+  selSlots.clear();updReserve();
+  updDate();buildCal();buildWS();buildGrid();buildRes();
+}
+
+function buildGrid(){
+  const grid=document.getElementById('slotGrid');grid.innerHTML='';
+  const total=CLOSE-OPEN;let openC=0;
+  for(let i=0;i<total;i++){
+    const h=OPEN+i;
+    const st=getSt(sel,i);
+    if(st==='available')openC++;
+    const isSel=selSlots.has(h);
+    const cls=isSel?'sc-selected':'sc-'+st;
+    const stTxt=isSel?'Selected':st==='available'?'Available':st==='taken'?'Taken':st==='pending'?'Pending':'Past';
+    const{n,s}=fmtH(h);
+    const{n:en,s:es}=fmtH(h+1);
+    const card=document.createElement('div');
+    card.className=`slot-card ${cls}`;
+    card.dataset.h=h;
+    card.innerHTML=`
+      <div class="sc-time">${n} <span class="sc-ampm">${s}</span></div>
+      <div class="sc-bottom">
+        <span class="sc-status">${stTxt}</span>
+        ${st==='available'||isSel?`<div class="sc-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="${isSel?'rgba(15,36,24,.8)':'var(--txt3)'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`:''}
+      </div>
+    `;
+    if(st==='available')card.onclick=()=>toggleSlot(card,h);
+    grid.appendChild(card);
+  }
+  document.getElementById('openCount').textContent=`${openC} open`;
+  document.getElementById('heroOpenCount').innerHTML=`${openC} <em>open</em>`;
+}
+
+function toggleSlot(card,h){
+  if(selSlots.has(h)){
+    selSlots.delete(h);
+    card.classList.remove('sc-selected');card.classList.add('sc-available');
+    card.querySelector('.sc-status').textContent='Available';
+    const chk=card.querySelector('.sc-check svg path');
+    if(chk)chk.setAttribute('stroke','var(--txt3)');
+  } else {
+    selSlots.add(h);
+    card.classList.remove('sc-available');card.classList.add('sc-selected');
+    card.querySelector('.sc-status').textContent='Selected';
+    const chk=card.querySelector('.sc-check svg path');
+    if(chk)chk.setAttribute('stroke','rgba(15,36,24,.8)');
+  }
+  updReserve();
+}
+
+function updReserve(){
+  const n=selSlots.size,t=n*PRICE;
+  document.getElementById('rbSub').textContent=`${n} slot${n!==1?'s':''} · ${n} hr${n!==1?'s':''}`;
+  document.getElementById('rbPrice').textContent=`₱${t.toLocaleString()}`;
+  document.getElementById('resBar').classList.toggle('up',n>0);
+}
+
+const confToday=[
+  {time:'6:00 – 7:00 AM',name:'Lito',dur:1,cost:150},
+  {time:'9:00 – 10:00 AM',name:'Carlo',dur:1,cost:150},
+  {time:'11:00 AM – 1:00 PM',name:'Jay',dur:2,cost:300},
+  {time:'3:00 – 4:00 PM',name:'Rose',dur:1,cost:150},
+];
+function buildRes(){
+  const wrap=document.getElementById('resToday');wrap.innerHTML='';
+  const isT=sel.getTime()===today.getTime();
+  const items=isT?confToday:[];
+  if(!items.length){
+    const el=document.createElement('div');el.className='res-empty';
+    el.textContent='No confirmed bookings for this day.';
+    wrap.appendChild(el);return;
+  }
+  const list=document.createElement('div');list.className='res-list';
+  items.forEach(b=>{
+    const card=document.createElement('div');card.className='res-card';
+    card.innerHTML=`
+      <div class="res-time-block">
+        <div class="res-time">${b.time}</div>
+        <div class="res-name">${b.name}</div>
+      </div>
+      <div class="res-right">
+        <span class="res-duration">${b.dur} hr${b.dur>1?'s':''}</span>
+        <span class="res-cost">₱${b.cost.toLocaleString()}</span>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+  wrap.appendChild(list);
+}
+
+function toggleCI(){
+  ciOpen=!ciOpen;
+  document.getElementById('ciBody').classList.toggle('open',ciOpen);
+  document.getElementById('ciChev').classList.toggle('open',ciOpen);
+}
+
+function openSheet(){
+  const now=new Date();
+  const soon=[...selSlots].some(h=>{const m=(h-now.getHours())*60-now.getMinutes();return m>=0&&m<=60;});
+  if(soon){document.getElementById('wov').classList.add('show');return;}
+  showSheet();
+}
+function showSheet(){
+  const rows=document.getElementById('sumRows');rows.innerHTML='';
+  [...selSlots].sort((a,b)=>a-b).forEach(h=>{
+    const r=document.createElement('div');r.className='sum-row';
+    r.innerHTML=`<span class="sum-t">${fmtHStr(h)} – ${fmtHStr(h+1)}</span><span class="sum-p">₱${PRICE}</span>`;
+    rows.appendChild(r);
+  });
+  document.getElementById('sumTotal').textContent=`₱${(selSlots.size*PRICE).toLocaleString()}`;
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('sheet').classList.add('show');
+}
+function closeSheet(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('sheet').classList.remove('show');
+}
+function setPay(m){
+  pay=m;
+  document.getElementById('payG').classList.toggle('sel',m==='gcash');
+  document.getElementById('payC').classList.toggle('sel',m==='cash');
+}
+function submitBooking(){
+  const name=document.getElementById('fName').value.trim();
+  const phone=document.getElementById('fPhone').value.trim();
+  if(!name||!phone){alert('Please fill in your name and contact number.');return;}
+  const l4=phone.replace(/\D/g,'').slice(-4).padStart(4,'0');
+  const alpha='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const sfx=Array.from({length:3},()=>alpha[Math.floor(Math.random()*alpha.length)]).join('');
+  const code=`${l4}-${sfx}`;
+  const booked=[...selSlots].sort((a,b)=>a-b);
+  closeSheet();
+  booked.forEach(h=>{
+    document.querySelectorAll('.slot-card').forEach(c=>{
+      if(parseInt(c.dataset.h)===h){
+        c.className='slot-card sc-pending';
+        c.querySelector('.sc-status').textContent='Pending';
+        c.onclick=null;
+      }
+    });
+  });
+  selSlots.clear();updReserve();
+  document.getElementById('csCode').textContent=code;
+  const sl=document.getElementById('csSlots');sl.innerHTML='';
+  booked.forEach(h=>{
+    const r=document.createElement('div');r.className='cc-slot';
+    r.innerHTML=`<span class="cc-slot-t">${fmtHStr(h)} – ${fmtHStr(h+1)}</span><span class="cc-slot-d">1 hr · ₱${PRICE}</span>`;
+    sl.appendChild(r);
+  });
+  setTimeout(()=>document.getElementById('cs').classList.add('show'),340);
+}
+function doneCs(){document.getElementById('cs').classList.remove('show');}
+function closeWarn(){document.getElementById('wov').classList.remove('show');}
+function proceedAnyway(){closeWarn();showSheet();}
+function switchTab(i){document.querySelectorAll('.nav-tab').forEach((t,j)=>t.classList.toggle('active',i===j));}
+
+updDate();buildCal();buildWS();buildGrid();buildRes();
+</script>
+</body>
+</html>

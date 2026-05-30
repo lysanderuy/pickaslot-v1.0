@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>PickASlot — My Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --base:     #0F2418;
+  --card:     #162E20;
+  --elevated: #1C3828;
+  --border:   #2A4A35;
+  --border2:  #1F3D29;
+
+  --txt1: #F0F7F2;
+  --txt2: #8AAF95;
+  --txt3: #4A6B55;
+  --txt4: #2E4D38;
+
+  --avail:     #4ADE80;
+  --avail-dim: rgba(74,222,128,.12);
+  --pend:      #FBBF24;
+  --pend-dim:  rgba(251,191,36,.1);
+  --taken:     #F87171;
+  --taken-dim: rgba(248,113,113,.1);
+  --reject:    #F87171;
+  --reject-dim:rgba(248,113,113,.1);
+
+  --accent:    #F0F7F2;
+
+  --sans: 'Plus Jakarta Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+html,body{
+  height:100%;
+  background:var(--base);
+  font-family:var(--sans);
+  color:var(--txt1);
+  -webkit-font-smoothing:antialiased;
+}
+.shell{
+  max-width:430px;margin:0 auto;
+  min-height:100dvh;
+  display:flex;flex-direction:column;
+  background:var(--base);
+}
+
+/* ─── NAV ─── */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 0;
+  position:sticky;top:0;z-index:40;
+  background:var(--base);
+}
+.nav-brand{
+  font-size:18px;font-weight:800;
+  letter-spacing:-.02em;color:var(--txt1);
+}
+.nav-brand em{color:var(--avail);font-style:normal;}
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{
+  padding:7px 14px;
+  border:none;background:none;
+  font-family:var(--sans);font-size:12px;font-weight:600;
+  letter-spacing:.04em;
+  color:var(--txt3);cursor:pointer;
+  border-radius:20px;
+  transition:all .18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-tab.active{
+  background:var(--elevated);
+  color:var(--txt1);
+}
+
+/* ─── BODY ─── */
+.body{
+  flex:1;
+  padding:32px 20px 60px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+.body::-webkit-scrollbar{display:none;}
+
+/* ─── LOOKUP FORM ─── */
+.lookup-form{
+  display:flex;flex-direction:column;
+  gap:10px;
+  margin-bottom:32px;
+}
+.lookup-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:2px;
+  display:block;
+}
+.lookup-input-wrap{
+  display:flex;gap:8px;align-items:stretch;
+}
+.lookup-input{
+  flex:1;
+  padding:15px 16px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-family:var(--mono);
+  font-size:18px;font-weight:500;
+  color:var(--txt1);
+  outline:none;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  transition:all .18s;
+}
+.lookup-input:focus{
+  border-color:var(--avail);
+  box-shadow:0 0 0 3px var(--avail-dim);
+  background:var(--elevated);
+}
+.lookup-input::placeholder{
+  color:var(--txt4);
+  font-size:15px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.lookup-btn{
+  padding:0 20px;
+  background:var(--accent);
+  border:none;border-radius:12px;
+  font-family:var(--sans);font-size:13px;font-weight:800;
+  color:var(--base);
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  letter-spacing:-.01em;
+}
+.lookup-btn:active{transform:scale(.97);opacity:.9;}
+
+.lookup-hint{
+  font-size:12px;font-weight:500;
+  color:var(--txt3);
+  font-style:italic;
+}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{
+  flex:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  gap:12px;
+  padding:40px 20px;
+}
+.empty-icon{
+  width:64px;height:64px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+  margin-bottom:4px;
+}
+.empty-title{
+  font-size:17px;font-weight:700;
+  color:var(--txt2);letter-spacing:-.01em;
+}
+.empty-sub{
+  font-size:13px;font-weight:500;
+  color:var(--txt3);line-height:1.5;
+  max-width:260px;
+}
+
+/* ─── ERROR STATE ─── */
+.error-card{
+  background:var(--taken-dim);
+  border:1px solid rgba(248,113,113,.2);
+  border-radius:14px;
+  padding:18px 20px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.error-icon{
+  font-size:20px;flex-shrink:0;margin-top:1px;
+}
+.error-title{
+  font-size:15px;font-weight:700;
+  color:var(--taken);margin-bottom:4px;
+}
+.error-sub{
+  font-size:13px;font-weight:500;
+  color:rgba(248,113,113,.7);line-height:1.5;
+}
+
+/* ─── RESULT CARD ─── */
+.result-wrap{
+  display:flex;flex-direction:column;gap:10px;
+}
+
+/* status banner */
+.status-banner{
+  border-radius:14px;
+  padding:16px 18px;
+  display:flex;align-items:center;gap:14px;
+}
+.status-banner.s-pending{
+  background:var(--pend-dim);
+  border:1px solid rgba(251,191,36,.2);
+}
+.status-banner.s-confirmed{
+  background:var(--avail-dim);
+  border:1px solid rgba(74,222,128,.2);
+}
+.status-banner.s-rejected{
+  background:var(--reject-dim);
+  border:1px solid rgba(248,113,113,.2);
+}
+
+.status-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;
+}
+.s-pending   .status-dot{background:var(--pend);box-shadow:0 0 8px rgba(251,191,36,.5);}
+.s-confirmed .status-dot{background:var(--avail);box-shadow:0 0 8px rgba(74,222,128,.5);}
+.s-rejected  .status-dot{background:var(--reject);box-shadow:0 0 8px rgba(248,113,113,.5);}
+
+.status-text-wrap{flex:1;}
+.status-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:2px;
+}
+.s-pending   .status-label{color:var(--pend);}
+.s-confirmed .status-label{color:var(--avail);}
+.s-rejected  .status-label{color:var(--reject);}
+
+.status-desc{
+  font-size:13px;font-weight:500;
+  line-height:1.4;
+}
+.s-pending   .status-desc{color:rgba(251,191,36,.75);}
+.s-confirmed .status-desc{color:rgba(74,222,128,.75);}
+.s-rejected  .status-desc{color:rgba(248,113,113,.75);}
+
+/* booking code card */
+.booking-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.bc-code-row{
+  padding:18px 18px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.bc-code-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:4px;
+}
+.bc-code-val{
+  font-family:var(--mono);
+  font-size:28px;font-weight:500;
+  color:var(--avail);letter-spacing:.08em;
+  line-height:1;
+}
+.bc-name{
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+}
+.bc-name-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);
+}
+.bc-name-val{
+  font-size:16px;font-weight:700;
+  color:var(--txt1);letter-spacing:-.01em;
+}
+
+/* slots inside booking card */
+.bc-slots{padding:14px 18px;border-bottom:1px solid var(--border);}
+.bc-slots-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:10px;
+}
+.bc-slot-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid var(--border2);
+}
+.bc-slot-row:last-child{border-bottom:none;}
+.bc-slot-time{
+  font-size:15px;font-weight:700;
+  color:var(--txt1);letter-spacing:-.01em;
+}
+.bc-slot-meta{
+  font-family:var(--mono);
+  font-size:11px;color:var(--txt3);
+}
+
+/* payment + total */
+.bc-footer{
+  padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.bc-pay{display:flex;flex-direction:column;gap:3px;}
+.bc-pay-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);
+}
+.bc-pay-val{
+  font-size:15px;font-weight:700;
+  color:var(--txt1);
+  display:flex;align-items:center;gap:6px;
+}
+.bc-pay-icon{font-size:16px;}
+.bc-total{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.bc-total-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);
+}
+.bc-total-val{
+  font-size:20px;font-weight:800;
+  color:var(--txt1);letter-spacing:-.02em;
+}
+
+/* pending note */
+.pending-note{
+  background:var(--elevated);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px 16px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.pending-note-txt{
+  font-size:13px;font-weight:500;
+  color:var(--txt2);line-height:1.55;
+}
+
+/* clear btn */
+.clear-btn{
+  width:100%;
+  padding:14px;
+  background:none;
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  color:var(--txt3);cursor:pointer;
+  transition:all .15s;
+  letter-spacing:.02em;
+  margin-top:4px;
+}
+.clear-btn:active{background:var(--elevated);color:var(--txt2);}
+
+/* animations */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.result-wrap{animation:fadeUp .25s ease both;}
+.error-card{animation:fadeUp .2s ease both;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="nav-brand">PickA<em>Slot</em></div>
+    <div class="nav-tabs">
+      <button class="nav-tab" onclick="window.location.href='book.html'">Book</button>
+      <button class="nav-tab active">My Booking</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LOOKUP FORM -->
+    <div class="lookup-form">
+      <label class="lookup-label" for="codeInput">Booking Code</label>
+      <div class="lookup-input-wrap">
+        <input
+          class="lookup-input"
+          id="codeInput"
+          type="text"
+          placeholder="e.g. 1234-XK9"
+          maxlength="8"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+          oninput="this.value=this.value.toUpperCase()"
+          onkeydown="if(event.key==='Enter')lookupBooking()"
+        />
+        <button class="lookup-btn" onclick="lookupBooking()">Look Up</button>
+      </div>
+      <span class="lookup-hint">Your code was shown after submitting your booking request.</span>
+    </div>
+
+    <!-- RESULT AREA -->
+    <div id="resultArea">
+      <!-- empty state by default -->
+      <div class="empty-state">
+        <div class="empty-icon">🎫</div>
+        <div class="empty-title">No booking looked up yet</div>
+        <div class="empty-sub">Enter the code from your booking confirmation above to see your reservation.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Pre-fill mock and show result on load
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('codeInput').value = '9012-CNF';
+  lookupBooking();
+});
+
+const PRICE = 150;
+
+// Mock bookings for demo — keyed by code
+const MOCK_BOOKINGS = {
+  '5678-PND': {
+    code: '5678-PND',
+    name: 'Maria',
+    status: 'pending',
+    payment: 'GCash',
+    slots: [
+      { time: '3:00 – 4:00 PM', date: 'Today' },
+      { time: '4:00 – 5:00 PM', date: 'Today' },
+    ],
+  },
+  '9012-CNF': {
+    code: '9012-CNF',
+    name: 'Carlo',
+    status: 'confirmed',
+    payment: 'Cash',
+    slots: [
+      { time: '9:00 – 10:00 AM', date: 'Today' },
+    ],
+  },
+  '3456-REJ': {
+    code: '3456-REJ',
+    name: 'Jay',
+    status: 'rejected',
+    payment: 'GCash',
+    slots: [
+      { time: '6:00 – 7:00 PM', date: 'Today' },
+    ],
+  },
+};
+
+const STATUS_CONFIG = {
+  pending: {
+    label: 'Pending Confirmation',
+    desc: 'Your booking is awaiting admin approval.',
+    note: 'The admin will review your request shortly. No action needed — just hold on to your booking code.',
+    bannerClass: 's-pending',
+  },
+  confirmed: {
+    label: 'Confirmed',
+    desc: 'Your booking has been confirmed. See you on the court!',
+    note: null,
+    bannerClass: 's-confirmed',
+  },
+  rejected: {
+    label: 'Rejected',
+    desc: 'Unfortunately your booking was not approved.',
+    note: 'Your slot has been released and is now available for others to book. You may submit a new request for a different slot.',
+    bannerClass: 's-rejected',
+  },
+};
+
+const PAY_ICONS = { GCash: '💳', Cash: '💵' };
+
+function lookupBooking() {
+  const raw = document.getElementById('codeInput').value.trim().toUpperCase();
+  const area = document.getElementById('resultArea');
+
+  if (!raw) {
+    showEmpty(area);
+    return;
+  }
+
+  // validate format: 4 digits, dash, 3 alphanumeric
+  const valid = /^[0-9]{4}-[A-Z0-9]{3}$/.test(raw);
+  if (!valid) {
+    showError(area, 'Invalid code format', 'Booking codes look like 1234-XK9 — four digits, a dash, then three characters. Double-check and try again.');
+    return;
+  }
+
+  const booking = MOCK_BOOKINGS[raw];
+  if (!booking) {
+    showError(area, 'Booking not found', 'We couldn\'t find a booking with that code. Make sure you entered it exactly as shown on your confirmation screen.');
+    return;
+  }
+
+  showResult(area, booking);
+}
+
+function showEmpty(area) {
+  area.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">🎫</div>
+      <div class="empty-title">No booking looked up yet</div>
+      <div class="empty-sub">Enter the code from your booking confirmation above to see your reservation.</div>
+    </div>
+  `;
+}
+
+function showError(area, title, sub) {
+  area.innerHTML = `
+    <div class="error-card">
+      <div class="error-icon">⚠️</div>
+      <div>
+        <div class="error-title">${title}</div>
+        <div class="error-sub">${sub}</div>
+      </div>
+    </div>
+  `;
+}
+
+function showResult(area, booking) {
+  const cfg = STATUS_CONFIG[booking.status];
+  const totalCost = booking.slots.length * PRICE;
+  const payIcon = PAY_ICONS[booking.payment] || '';
+
+  const slotsHTML = booking.slots.map(s => `
+    <div class="bc-slot-row">
+      <span class="bc-slot-time">${s.time}</span>
+      <span class="bc-slot-meta">${s.date} · 1 hr · ₱${PRICE}</span>
+    </div>
+  `).join('');
+
+  const noteHTML = cfg.note ? `
+    <div class="pending-note">
+      <span style="font-size:16px;flex-shrink:0;margin-top:1px;">ℹ️</span>
+      <span class="pending-note-txt">${cfg.note}</span>
+    </div>
+  ` : '';
+
+  area.innerHTML = `
+    <div class="result-wrap">
+
+      <div class="status-banner ${cfg.bannerClass}">
+        <div class="status-dot"></div>
+        <div class="status-text-wrap">
+          <div class="status-label">${cfg.label}</div>
+          <div class="status-desc">${cfg.desc}</div>
+        </div>
+      </div>
+
+      <div class="booking-card">
+
+        <div class="bc-code-row">
+          <div>
+            <div class="bc-code-label">Booking Code</div>
+            <div class="bc-code-val">${booking.code}</div>
+          </div>
+          <div class="bc-name">
+            <span class="bc-name-label">Name</span>
+            <span class="bc-name-val">${booking.name}</span>
+          </div>
+        </div>
+
+        <div class="bc-slots">
+          <div class="bc-slots-label">Reserved Slots</div>
+          ${slotsHTML}
+        </div>
+
+        <div class="bc-footer">
+          <div class="bc-pay">
+            <span class="bc-pay-label">Payment</span>
+            <span class="bc-pay-val">
+              <span class="bc-pay-icon">${payIcon}</span>
+              ${booking.payment}
+            </span>
+          </div>
+          <div class="bc-total">
+            <span class="bc-total-label">Total</span>
+            <span class="bc-total-val">₱${totalCost.toLocaleString()}</span>
+          </div>
+        </div>
+
+      </div>
+
+      ${noteHTML}
+
+      <button class="clear-btn" onclick="clearLookup()">Look up a different code</button>
+
+    </div>
+  `;
+}
+
+function clearLookup() {
+  document.getElementById('codeInput').value = '';
+  showEmpty(document.getElementById('resultArea'));
+  document.getElementById('codeInput').focus();
+}
+</script>
+</body>
+</html>
