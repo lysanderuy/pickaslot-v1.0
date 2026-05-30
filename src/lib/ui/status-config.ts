@@ -2,7 +2,7 @@ export const STATUS_CONFIG = {
   pending: {
     label: "Pending Confirmation",
     desc: "Your booking is awaiting admin approval.",
-    note: "The admin will review your request shortly. No action needed — just hold on to your booking code.",
+    note: "The admin will review your request shortly. No action needed; just hold on to your booking code.",
     bannerBg: "rgba(251, 191, 36, 0.1)",
     bannerBorder: "rgba(251, 191, 36, 0.2)",
     dotClass: "bg-[#FBBF24] shadow-[0_0_8px_rgba(251,191,36,0.5)]",

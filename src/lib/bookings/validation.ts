@@ -13,7 +13,7 @@ export function validateBookingCode(code: string): ValidationResult {
   if (!BOOKING_CODE_REGEX.test(trimmed)) {
     return {
       valid: false,
-      error: "Booking codes look like 1234-XK9 — four digits, a dash, then three characters.",
+      error: "Booking codes look like 1234-XK9: four digits, a dash, then three characters.",
     };
   }
   return { valid: true };
