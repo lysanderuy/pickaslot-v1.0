@@ -1,4 +1,66 @@
-import type { BookingStatus, PaymentMethod } from "@/lib/db";
+export type SlotState = "available" | "pending" | "confirmed" | "past";
+export type UiSlotState = "available" | "pending" | "taken" | "past";
+export type PaymentMethod = "gcash" | "cash";
+export type LookupState = "idle" | "loading" | "result" | "error";
+
+export interface Court {
+  id: string;
+  name: string;
+  location: string;
+  timezone: string;
+  openTime: string;
+  closeTime: string;
+  pricePerHourCents: number;
+  currencyCode: string;
+  isAcceptingBookings: boolean;
+  houseRules: string;
+  paymentInstructions: string;
+}
+
+export interface AvailabilityRow {
+  slot_start_at: string;
+  slot_end_at: string;
+  slot_state: SlotState;
+  booking_id: string | null;
+  booking_code: string | null;
+  first_name: string | null;
+  payment_method: PaymentMethod | null;
+  total_cost_cents: number | null;
+}
+
+export interface PublicBookingLookupResult {
+  booking_code: string;
+  first_name: string;
+  status: "pending" | "confirmed" | "rejected";
+  payment_method: PaymentMethod;
+  price_per_hour_cents: number;
+  total_cost_cents: number;
+  booking_date: string;
+  slots: Array<{
+    slot_start_at: string;
+    slot_end_at: string;
+  }>;
+}
+
+export interface ConfirmedReservation {
+  bookingId: string;
+  timeRange: string;
+  firstName: string;
+  duration: number;
+  totalCostCents: number;
+}
+
+export interface Confirmation {
+  code: string;
+  slots: AvailabilityRow[];
+}
+
+export interface BookingResponse {
+  booking: {
+    booking_code?: string;
+    bookingCode?: string;
+  };
+}
 
 export interface CreateBookingRequestInput {
   courtId: string;
@@ -9,39 +71,9 @@ export interface CreateBookingRequestInput {
   slotStarts: string[];
 }
 
-export interface PublicBookingLookupSlot {
-  slot_start_at: string;
-  slot_end_at: string;
-  status: BookingStatus;
-}
-
-export interface PublicBookingLookupResult {
-  booking_id: string;
-  booking_code: string;
-  court_id: string;
-  court_name: string;
-  booking_date: string;
-  first_name: string;
-  contact_number: string;
-  payment_method: PaymentMethod;
-  status: BookingStatus;
-  slot_count: number;
-  price_per_hour_cents: number;
-  total_cost_cents: number;
-  reviewed_at: string | null;
-  rejected_reason: string | null;
-  created_at: string;
-  updated_at: string;
-  slots: PublicBookingLookupSlot[];
-}
-
 export interface DayAvailabilityRow {
   slot_start_at: string;
   slot_end_at: string;
-  slot_state: "available" | "pending" | "confirmed" | "past";
+  slot_state: SlotState;
   booking_id: string | null;
-  booking_code: string | null;
-  first_name: string | null;
-  payment_method: PaymentMethod | null;
-  total_cost_cents: number | null;
 }
