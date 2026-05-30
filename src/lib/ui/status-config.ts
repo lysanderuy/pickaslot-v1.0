@@ -1,0 +1,32 @@
+export const STATUS_CONFIG = {
+  pending: {
+    label: "Pending Confirmation",
+    desc: "Your booking is awaiting admin approval.",
+    note: "The admin will review your request shortly. No action needed — just hold on to your booking code.",
+    bannerBg: "rgba(251, 191, 36, 0.1)",
+    bannerBorder: "rgba(251, 191, 36, 0.2)",
+    dotClass: "bg-[#FBBF24] shadow-[0_0_8px_rgba(251,191,36,0.5)]",
+    labelClass: "text-[#FBBF24]",
+    descClass: "text-[rgba(251,191,36,0.75)]",
+  },
+  confirmed: {
+    label: "Confirmed",
+    desc: "Your booking has been confirmed. See you on the court!",
+    note: null,
+    bannerBg: "rgba(74, 222, 128, 0.12)",
+    bannerBorder: "rgba(74, 222, 128, 0.2)",
+    dotClass: "bg-[#4ADE80] shadow-[0_0_8px_rgba(74,222,128,0.5)]",
+    labelClass: "text-[#4ADE80]",
+    descClass: "text-[rgba(74,222,128,0.75)]",
+  },
+  rejected: {
+    label: "Rejected",
+    desc: "Unfortunately your booking was not approved.",
+    note: "Your slot has been released and is now available for others to book. You may submit a new request for a different slot.",
+    bannerBg: "rgba(248, 113, 113, 0.1)",
+    bannerBorder: "rgba(248, 113, 113, 0.2)",
+    dotClass: "bg-[#F87171] shadow-[0_0_8px_rgba(248,113,113,0.5)]",
+    labelClass: "text-[#F87171]",
+    descClass: "text-[rgba(248,113,113,0.75)]",
+  },
+} as const;
