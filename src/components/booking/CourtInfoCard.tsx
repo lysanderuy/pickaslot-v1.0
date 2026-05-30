@@ -37,7 +37,7 @@ export function CourtInfoCard({ court }: CourtInfoCardProps) {
   const priceLabel = `${(court.pricePerHourCents / 100).toLocaleString("en-PH", { maximumFractionDigits: 0, style: "currency", currency: "PHP" })}`;
 
   return (
-    <section className="pt-6 pb-36">
+    <section className="pt-6 pb-12 lg:pb-16">
       <div className={`${tw.sectionLabel} mb-3`}>Court Info</div>
       <div className="overflow-hidden rounded-[14px] border border-[#2A4A35] bg-[#162E20]">
         <button
@@ -104,7 +104,7 @@ export function CourtInfoCard({ court }: CourtInfoCardProps) {
                     {paymentLines.length > 0 ? (
                       <div className="flex flex-col gap-1.5">
                         {paymentLines.map((line, i) => {
-                          const sep = line.indexOf(" — ");
+                          const sep = line.indexOf(" - ");
                           const isLast = i === paymentLines.length - 1 && paymentLines.length > 1;
                           if (sep !== -1 && !isLast) {
                             return (
