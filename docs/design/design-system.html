@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PickASlot — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --base:     #0F2418;
+  --card:     #162E20;
+  --elevated: #1C3828;
+  --border:   #2A4A35;
+  --border2:  #1F3D29;
+  --txt1:     #F0F7F2;
+  --txt2:     #8AAF95;
+  --txt3:     #4A6B55;
+  --txt4:     #2E4D38;
+  --avail:    #4ADE80;
+  --avail-dim:rgba(74,222,128,.12);
+  --pend:     #FBBF24;
+  --pend-dim: rgba(251,191,36,.1);
+  --taken:    #F87171;
+  --taken-dim:rgba(248,113,113,.1);
+  --accent:   #F0F7F2;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --page-bg:#0a1c10;
+}
+
+html,body{
+  background:var(--page-bg);
+  font-family:var(--sans);
+  color:var(--txt1);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+
+.doc{
+  max-width:760px;
+  margin:0 auto;
+  padding:60px 32px 120px;
+}
+
+/* ── SHARED ── */
+h1,h2,h3,h4{letter-spacing:-.02em;line-height:1.15;}
+p{font-size:14px;font-weight:500;color:var(--txt2);line-height:1.7;}
+code{
+  font-family:var(--mono);
+  font-size:12px;
+  background:var(--elevated);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:2px 7px;
+  color:var(--avail);
+}
+
+.divider{
+  height:1px;background:var(--border);
+  margin:56px 0;
+}
+
+/* ── COVER ── */
+.cover{
+  margin-bottom:64px;
+  padding-bottom:56px;
+  border-bottom:1px solid var(--border);
+}
+.cover-eyebrow{
+  font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:16px;
+}
+.cover-title{
+  font-size:52px;font-weight:800;
+  color:var(--txt1);margin-bottom:8px;
+}
+.cover-title em{color:var(--avail);font-style:normal;}
+.cover-sub{
+  font-size:16px;font-weight:500;
+  color:var(--txt2);max-width:480px;
+  line-height:1.6;margin-bottom:28px;
+}
+.cover-meta{
+  display:flex;gap:24px;flex-wrap:wrap;
+}
+.cover-meta-item{
+  display:flex;flex-direction:column;gap:3px;
+}
+.cover-meta-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt4);
+}
+.cover-meta-val{
+  font-size:14px;font-weight:600;
+  color:var(--txt2);
+}
+
+/* ── SECTION HEADERS ── */
+.sec-title{
+  font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:8px;
+}
+.sec-heading{
+  font-size:28px;font-weight:800;
+  color:var(--txt1);margin-bottom:16px;
+}
+.sec-body{
+  font-size:14px;font-weight:500;
+  color:var(--txt2);line-height:1.7;
+  margin-bottom:32px;
+  max-width:560px;
+}
+
+/* ── GRID LAYOUTS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+
+@media(max-width:600px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr;}
+  .cover-title{font-size:36px;}
+}
+
+/* ── COLOR SWATCHES ── */
+.swatch{
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+.swatch-color{
+  height:72px;
+}
+.swatch-info{
+  padding:12px;
+  background:var(--card);
+}
+.swatch-name{
+  font-size:13px;font-weight:700;
+  color:var(--txt1);letter-spacing:-.01em;
+  margin-bottom:2px;
+}
+.swatch-hex{
+  font-family:var(--mono);
+  font-size:11px;color:var(--txt3);
+}
+.swatch-role{
+  font-size:11px;font-weight:500;
+  color:var(--txt3);margin-top:4px;
+}
+
+/* ── TYPOGRAPHY SPECIMENS ── */
+.type-specimen{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px 24px;
+  margin-bottom:8px;
+}
+.type-specimen-meta{
+  font-family:var(--mono);
+  font-size:10px;color:var(--txt4);
+  margin-bottom:10px;
+  letter-spacing:.06em;
+}
+.type-specimen-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);margin-top:12px;margin-bottom:2px;
+}
+
+/* ── SPACING SCALE ── */
+.space-row{
+  display:flex;align-items:center;gap:16px;
+  padding:10px 0;border-bottom:1px solid var(--border2);
+}
+.space-row:last-child{border-bottom:none;}
+.space-box{
+  background:var(--avail-dim);
+  border:1px solid rgba(74,222,128,.2);
+  border-radius:4px;
+  flex-shrink:0;
+}
+.space-info{display:flex;flex-direction:column;gap:2px;}
+.space-name{font-size:13px;font-weight:700;color:var(--txt1);}
+.space-val{font-family:var(--mono);font-size:11px;color:var(--txt3);}
+
+/* ── BORDER RADIUS ── */
+.radius-row{
+  display:flex;align-items:center;gap:16px;
+  padding:10px 0;border-bottom:1px solid var(--border2);
+}
+.radius-row:last-child{border-bottom:none;}
+.radius-box{
+  width:56px;height:56px;
+  background:var(--elevated);
+  border:1px solid var(--border);
+  flex-shrink:0;
+}
+.radius-info{display:flex;flex-direction:column;gap:2px;}
+.radius-name{font-size:13px;font-weight:700;color:var(--txt1);}
+.radius-val{font-family:var(--mono);font-size:11px;color:var(--txt3);}
+
+/* ── COMPONENT CARDS ── */
+.comp-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+  margin-bottom:12px;
+}
+.comp-card-title{
+  font-size:13px;font-weight:700;
+  color:var(--txt2);letter-spacing:.04em;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.comp-card-row{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.comp-note{
+  font-size:12px;font-weight:500;
+  color:var(--txt3);font-style:italic;
+  margin-top:12px;
+}
+
+/* ── SLOT DEMO ── */
+.slot-demo-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+}
+.slot-demo{
+  border-radius:14px;padding:11px 12px 10px;
+  display:flex;flex-direction:column;gap:5px;
+}
+.slot-demo .sd-time{
+  font-size:16px;font-weight:800;
+  letter-spacing:-.02em;line-height:1;white-space:nowrap;
+}
+.slot-demo .sd-ampm{font-size:12px;font-weight:600;opacity:.7;}
+.slot-demo .sd-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:1px;
+}
+.slot-demo .sd-status{
+  font-size:10px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+}
+.sd-available{
+  background:var(--elevated);border:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+.sd-available .sd-time{color:var(--txt1);}
+.sd-available .sd-status{color:var(--avail);}
+.sd-selected{
+  background:var(--avail);border:1px solid var(--avail);
+  box-shadow:0 4px 20px rgba(74,222,128,.3);
+}
+.sd-selected .sd-time{color:var(--base);}
+.sd-selected .sd-status{color:rgba(15,36,24,.7);}
+.sd-taken{
+  background:var(--taken-dim);border:1px solid rgba(248,113,113,.15);
+  opacity:.7;
+}
+.sd-taken .sd-time{color:var(--taken);}
+.sd-taken .sd-status{color:var(--taken);}
+.sd-pending{
+  background:var(--pend-dim);border:1px solid rgba(251,191,36,.15);
+}
+.sd-pending .sd-time{color:var(--pend);}
+.sd-pending .sd-status{color:var(--pend);}
+.sd-past{
+  background:transparent;border:1px solid var(--border2);
+  opacity:.35;
+}
+.sd-past .sd-time{color:var(--txt3);}
+.sd-past .sd-status{color:var(--txt4);}
+
+/* ── STATUS BANNERS ── */
+.status-demo{
+  display:flex;align-items:center;gap:12px;
+  border-radius:12px;padding:14px 16px;
+  margin-bottom:8px;
+}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.status-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.status-desc{font-size:12px;font-weight:500;margin-top:2px;}
+
+/* ── NAV DEMO ── */
+.nav-demo{
+  background:var(--base);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-demo-brand{font-size:18px;font-weight:800;letter-spacing:-.02em;}
+.nav-demo-brand em{color:var(--avail);font-style:normal;}
+.nav-demo-tabs{display:flex;gap:4px;}
+.nav-demo-tab{
+  padding:6px 13px;border-radius:20px;
+  font-size:12px;font-weight:600;letter-spacing:.04em;
+}
+.nav-demo-tab.active{background:var(--elevated);color:var(--txt1);}
+.nav-demo-tab.inactive{color:var(--txt3);}
+
+/* ── BUTTON DEMO ── */
+.btn-demo{
+  display:inline-flex;align-items:center;justify-content:space-between;
+  gap:12px;
+  border:none;border-radius:14px;
+  padding:16px 22px;
+  cursor:default;
+  width:100%;
+}
+.btn-demo-primary{
+  background:var(--accent);
+  box-shadow:0 8px 32px rgba(240,247,242,.15);
+}
+.btn-demo-primary .btn-label{
+  font-size:15px;font-weight:800;color:var(--base);
+}
+.btn-demo-primary .btn-sub{
+  font-family:var(--mono);font-size:11px;color:rgba(15,36,24,.5);
+}
+.btn-demo-primary .btn-price{
+  font-size:22px;font-weight:800;color:var(--base);
+}
+
+/* ── INPUT DEMO ── */
+.input-demo{
+  width:100%;
+  padding:14px 16px;
+  background:var(--elevated);
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-family:var(--sans);font-size:16px;font-weight:500;
+  color:var(--txt1);
+}
+.input-demo.focused{
+  border-color:var(--avail);
+  box-shadow:0 0 0 3px var(--avail-dim);
+}
+
+/* ── MOTION TABLE ── */
+.motion-table{width:100%;border-collapse:collapse;}
+.motion-table th{
+  text-align:left;
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--txt3);
+  padding:8px 12px;
+  border-bottom:1px solid var(--border);
+}
+.motion-table td{
+  font-size:13px;font-weight:500;
+  color:var(--txt2);
+  padding:10px 12px;
+  border-bottom:1px solid var(--border2);
+  vertical-align:top;
+}
+.motion-table td:first-child{
+  font-family:var(--mono);font-size:12px;
+  color:var(--avail);font-weight:400;
+}
+.motion-table tr:last-child td{border-bottom:none;}
+
+/* ── PRINCIPLES ── */
+.principle-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px 22px;
+}
+.principle-num{
+  font-family:var(--mono);
+  font-size:11px;color:var(--txt4);
+  margin-bottom:8px;
+}
+.principle-title{
+  font-size:16px;font-weight:800;
+  color:var(--txt1);letter-spacing:-.01em;
+  margin-bottom:6px;
+}
+.principle-body{
+  font-size:13px;font-weight:500;
+  color:var(--txt3);line-height:1.6;
+}
+
+/* ── TOC ── */
+.toc{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px 24px;
+  margin-bottom:56px;
+}
+.toc-title{
+  font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:14px;
+}
+.toc-list{
+  display:flex;flex-direction:column;gap:6px;
+  list-style:none;
+}
+.toc-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:600;color:var(--txt2);
+}
+.toc-num{
+  font-family:var(--mono);font-size:11px;
+  color:var(--txt4);min-width:20px;
+}
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-eyebrow">Brand & Design System · v1.0</div>
+    <div class="cover-title">PickA<em>Slot</em></div>
+    <div class="cover-sub">A court booking app for Sunrise Village subdivision. This document defines the visual language, component rules, and design principles for all PickASlot surfaces.</div>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Product</span>
+        <span class="cover-meta-val">PickASlot</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Platform</span>
+        <span class="cover-meta-val">Mobile-first Web App</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Mode</span>
+        <span class="cover-meta-val">Dark (Court Green)</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Version</span>
+        <span class="cover-meta-val">1.0 · MVP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li class="toc-item"><span class="toc-num">01</span>Brand Principles</li>
+      <li class="toc-item"><span class="toc-num">02</span>Logo & Wordmark</li>
+      <li class="toc-item"><span class="toc-num">03</span>Color System</li>
+      <li class="toc-item"><span class="toc-num">04</span>Typography</li>
+      <li class="toc-item"><span class="toc-num">05</span>Spacing Scale</li>
+      <li class="toc-item"><span class="toc-num">06</span>Border Radius</li>
+      <li class="toc-item"><span class="toc-num">07</span>Motion</li>
+      <li class="toc-item"><span class="toc-num">08</span>Components</li>
+      <li class="toc-item"><span class="toc-num">09</span>Slot States</li>
+      <li class="toc-item"><span class="toc-num">10</span>Booking Status</li>
+    </ul>
+  </div>
+
+  <!-- 01 PRINCIPLES -->
+  <div class="sec-title">01</div>
+  <div class="sec-heading">Brand Principles</div>
+  <div class="sec-body">Four principles that guide every design decision in PickASlot. When in doubt, come back to these.</div>
+
+  <div class="grid-2" style="margin-bottom:8px;">
+    <div class="principle-card">
+      <div class="principle-num">01</div>
+      <div class="principle-title">Clarity of Action</div>
+      <div class="principle-body">The user should always know what to do next. Available slots look tappable. The Reserve button is unmissable. Nothing competes for primary attention.</div>
+    </div>
+    <div class="principle-card">
+      <div class="principle-num">02</div>
+      <div class="principle-title">Accessible Confidence</div>
+      <div class="principle-body">Designed for all ages, including older homeowners. Large tap targets, high contrast, clear labels. Simple without being patronizing.</div>
+    </div>
+    <div class="principle-card">
+      <div class="principle-num">03</div>
+      <div class="principle-title">Native to the Sport</div>
+      <div class="principle-body">The deep court-green palette, the court line texture in the hero, the slot grid layout — the app feels like it belongs on a pickleball court without being a billboard for it.</div>
+    </div>
+    <div class="principle-card">
+      <div class="principle-num">04</div>
+      <div class="principle-title">Neighborhood Scale</div>
+      <div class="principle-body">This is not a SaaS product. No landing page, no onboarding, no gamification. Open the app, pick a slot, done. Every feature earns its place.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 02 WORDMARK -->
+  <div class="sec-title">02</div>
+  <div class="sec-heading">Logo & Wordmark</div>
+  <div class="sec-body">PickASlot uses a text-only wordmark. "PickA" in near-white, "Slot" in court green. No icon, no badge, no tagline. The name does the work.</div>
+
+  <div class="comp-card">
+    <div class="comp-card-title">Wordmark</div>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <!-- large -->
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt4);margin-bottom:8px;">Primary — on dark</div>
+        <div style="font-size:36px;font-weight:800;letter-spacing:-.02em;color:var(--txt1);">PickA<em style="color:var(--avail);font-style:normal;">Slot</em></div>
+      </div>
+      <!-- nav size -->
+      <div style="padding-top:16px;border-top:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt4);margin-bottom:8px;">Nav size — 18px / 800</div>
+        <div style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--txt1);">PickA<em style="color:var(--avail);font-style:normal;">Slot</em></div>
+      </div>
+    </div>
+    <div class="comp-note">Never alter the color split. Never add a drop shadow. Never place on a light background. Minimum size: 16px.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 03 COLOR -->
+  <div class="sec-title">03</div>
+  <div class="sec-heading">Color System</div>
+  <div class="sec-body">All colors derive from a deep court-green base. Surfaces layer progressively lighter. Status colors — green, amber, red — are the only vivid colors and carry strict semantic meaning.</div>
+
+  <!-- Surfaces -->
+  <div style="margin-bottom:8px;">
+    <p style="margin-bottom:12px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);">Surfaces</p>
+  </div>
+  <div class="grid-4" style="margin-bottom:24px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#0F2418;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Base</div>
+        <div class="swatch-hex">#0F2418</div>
+        <div class="swatch-role">App background</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#162E20;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Card</div>
+        <div class="swatch-hex">#162E20</div>
+        <div class="swatch-role">Cards, sections</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1C3828;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Elevated</div>
+        <div class="swatch-hex">#1C3828</div>
+        <div class="swatch-role">Available slots, modals</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#F0F7F2;border:1px solid rgba(255,255,255,.1);"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Accent</div>
+        <div class="swatch-hex">#F0F7F2</div>
+        <div class="swatch-role">Reserve button, CTA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Borders -->
+  <div style="margin-bottom:8px;">
+    <p style="margin-bottom:12px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);">Borders</p>
+  </div>
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#2A4A35;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Border</div>
+        <div class="swatch-hex">#2A4A35</div>
+        <div class="swatch-role">Primary borders, dividers</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1F3D29;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Border 2</div>
+        <div class="swatch-hex">#1F3D29</div>
+        <div class="swatch-role">Subtle separators</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text -->
+  <div style="margin-bottom:8px;">
+    <p style="margin-bottom:12px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);">Text</p>
+  </div>
+  <div class="grid-4" style="margin-bottom:24px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#F0F7F2;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Text 1</div>
+        <div class="swatch-hex">#F0F7F2</div>
+        <div class="swatch-role">Primary text</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#8AAF95;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Text 2</div>
+        <div class="swatch-hex">#8AAF95</div>
+        <div class="swatch-role">Secondary text</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#4A6B55;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Text 3</div>
+        <div class="swatch-hex">#4A6B55</div>
+        <div class="swatch-role">Labels, hints</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#2E4D38;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Text 4</div>
+        <div class="swatch-hex">#2E4D38</div>
+        <div class="swatch-role">Disabled, ghost</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div style="margin-bottom:8px;">
+    <p style="margin-bottom:12px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);">Status Colors — semantic only, never decorative</p>
+  </div>
+  <div class="grid-3" style="margin-bottom:8px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#4ADE80;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Available</div>
+        <div class="swatch-hex">#4ADE80</div>
+        <div class="swatch-role">Open slots, confirmed</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#FBBF24;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Pending</div>
+        <div class="swatch-hex">#FBBF24</div>
+        <div class="swatch-role">Awaiting confirmation</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#F87171;"></div>
+      <div class="swatch-info">
+        <div class="swatch-name">Taken / Rejected</div>
+        <div class="swatch-hex">#F87171</div>
+        <div class="swatch-role">Booked slots, rejected</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:0;">
+    <p style="font-size:12px;font-weight:500;color:var(--txt3);font-style:italic;">Color is always paired with a text label. Never use color alone to communicate slot state.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 04 TYPOGRAPHY -->
+  <div class="sec-title">04</div>
+  <div class="sec-heading">Typography</div>
+  <div class="sec-body">Two typefaces only. Plus Jakarta Sans for all UI and body text. DM Mono for data — codes, prices, durations, timestamps.</div>
+
+  <!-- Typeface overview -->
+  <div class="comp-card" style="margin-bottom:12px;">
+    <div class="comp-card-title">Plus Jakarta Sans — UI Typeface</div>
+    <div style="font-size:32px;font-weight:800;color:var(--txt1);letter-spacing:-.02em;margin-bottom:8px;">Court. Slot. Book.</div>
+    <div style="font-size:14px;font-weight:500;color:var(--txt2);margin-bottom:4px;">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm</div>
+    <div style="font-size:14px;font-weight:500;color:var(--txt2);">Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</div>
+    <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--txt4);">Weights used: 400 · 500 · 600 · 700 · 800</div>
+  </div>
+
+  <div class="comp-card" style="margin-bottom:24px;">
+    <div class="comp-card-title">DM Mono — Data Typeface</div>
+    <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--avail);letter-spacing:.06em;margin-bottom:8px;">5678-XK9</div>
+    <div style="font-family:var(--mono);font-size:14px;font-weight:400;color:var(--txt2);margin-bottom:4px;">₱150 · 2 hrs · Week 22</div>
+    <div style="font-family:var(--mono);font-size:14px;font-weight:400;color:var(--txt2);">0 1 2 3 4 5 6 7 8 9</div>
+    <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--txt4);">Weights used: 400 · 500</div>
+  </div>
+
+  <!-- Type scale -->
+  <div class="type-specimen">
+    <div class="type-specimen-meta">DISPLAY · 52px / 800 · tracking -.03em</div>
+    <div style="font-size:52px;font-weight:800;letter-spacing:-.03em;color:var(--txt1);line-height:1;">PickASlot</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">HEADING 1 · 28px / 800 · tracking -.03em</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--txt1);">My Booking</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">HEADING 2 · 22px / 800 · tracking -.02em</div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--txt1);">Sunrise Court</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">HEADING 3 · 18px / 800 · tracking -.02em</div>
+    <div style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--txt1);">Reserve Court</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">BODY LARGE · 16px / 700 · tracking -.01em</div>
+    <div style="font-size:16px;font-weight:700;letter-spacing:-.01em;color:var(--txt1);">Today, May 30</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">BODY · 14px / 500</div>
+    <div style="font-size:14px;font-weight:500;color:var(--txt2);">Your booking is awaiting admin approval. Save your code — you'll need it to check your status.</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">BODY SMALL · 13px / 500</div>
+    <div style="font-size:13px;font-weight:500;color:var(--txt2);">Block 4, Sunrise Village Subdivision · Behind the clubhouse</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">LABEL · 10px / 700 · tracking .12em · UPPERCASE</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);">Court Slots · Payment Method · House Rules</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">SLOT TIME · 16px / 800 · tracking -.02em · DM Sans</div>
+    <div style="font-size:16px;font-weight:800;letter-spacing:-.02em;color:var(--txt1);">6:00 <span style="font-size:12px;font-weight:600;opacity:.7;">AM</span></div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">DATA · DM Mono · 42px / 500 · tracking .06em</div>
+    <div style="font-family:var(--mono);font-size:42px;font-weight:500;color:var(--avail);letter-spacing:.06em;">1234-XK9</div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-specimen-meta">DATA SMALL · DM Mono · 11px / 400 · tracking .02em</div>
+    <div style="font-family:var(--mono);font-size:11px;font-weight:400;color:var(--txt3);letter-spacing:.02em;">2 hrs · Week 22 · ₱300</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 05 SPACING -->
+  <div class="sec-title">05</div>
+  <div class="sec-heading">Spacing Scale</div>
+  <div class="sec-body">Base unit is 4px. All spacing is a multiple of 4. Padding within components uses 8–20px. Section gaps use 24px. Page margins are 16–20px.</div>
+
+  <div class="comp-card">
+    <div class="comp-card-title">Spacing Tokens</div>
+    <div class="space-row">
+      <div class="space-box" style="width:4px;height:16px;"></div>
+      <div class="space-info"><span class="space-name">xs</span><span class="space-val">4px · gap between icon and text</span></div>
+    </div>
+    <div class="space-row">
+      <div class="space-box" style="width:8px;height:16px;"></div>
+      <div class="space-info"><span class="space-name">sm</span><span class="space-val">8px · slot grid gap, small component gaps</span></div>
+    </div>
+    <div class="space-row">
+      <div class="space-box" style="width:12px;height:16px;"></div>
+      <div class="space-info"><span class="space-name">md</span><span class="space-val">12px · card internal gaps</span></div>
+    </div>
+    <div class="space-row">
+      <div class="space-box" style="width:16px;height:16px;"></div>
+      <div class="space-info"><span class="space-name">lg</span><span class="space-val">16px · section padding, page margin</span></div>
+    </div>
+    <div class="space-row">
+      <div class="space-box" style="width:20px;height:16px;"></div>
+      <div class="space-info"><span class="space-name">xl</span><span class="space-val">20px · nav padding, card padding</span></div>
+    </div>
+    <div class="space-row">
+      <div class="space-box" style="width:24px;height:16px;"></div>
+      <div class="space-info"><span class="space-name">2xl</span><span class="space-val">24px · section top padding</span></div>
+    </div>
+    <div class="space-row">
+      <div class="space-box" style="width:32px;height:16px;"></div>
+      <div class="space-info"><span class="space-name">3xl</span><span class="space-val">32px · confirmation screen padding</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 06 BORDER RADIUS -->
+  <div class="sec-title">06</div>
+  <div class="sec-heading">Border Radius</div>
+  <div class="sec-body">Rounded corners throughout. Larger components use larger radii. Nothing is square-cornered except the final confirm button which spans full width.</div>
+
+  <div class="comp-card">
+    <div class="comp-card-title">Radius Tokens</div>
+    <div class="radius-row">
+      <div class="radius-box" style="border-radius:6px;"></div>
+      <div class="radius-info"><span class="radius-name">6px</span><span class="radius-val">Calendar day cells, small buttons, chevron icon backgrounds</span></div>
+    </div>
+    <div class="radius-row">
+      <div class="radius-box" style="border-radius:8px;"></div>
+      <div class="radius-info"><span class="radius-name">8px</span><span class="radius-val">Court info row icons, small icon containers</span></div>
+    </div>
+    <div class="radius-row">
+      <div class="radius-box" style="border-radius:10px;"></div>
+      <div class="radius-info"><span class="radius-name">10px</span><span class="radius-val">Week day cards, form inputs, small cards</span></div>
+    </div>
+    <div class="radius-row">
+      <div class="radius-box" style="border-radius:12px;"></div>
+      <div class="radius-info"><span class="radius-name">12px</span><span class="radius-val">Reservation cards, booking sheet CTA</span></div>
+    </div>
+    <div class="radius-row">
+      <div class="radius-box" style="border-radius:14px;"></div>
+      <div class="radius-info"><span class="radius-name">14px</span><span class="radius-val">Slot cards, date trigger, reserve button, court info card</span></div>
+    </div>
+    <div class="radius-row">
+      <div class="radius-box" style="border-radius:20px;"></div>
+      <div class="radius-info"><span class="radius-name">20px</span><span class="radius-val">Court Hero card, nav tab pills</span></div>
+    </div>
+    <div class="radius-row">
+      <div class="radius-box" style="border-radius:22px;"></div>
+      <div class="radius-info"><span class="radius-name">22px</span><span class="radius-val">Bottom sheets (top corners only)</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 07 MOTION -->
+  <div class="sec-title">07</div>
+  <div class="sec-heading">Motion</div>
+  <div class="sec-body">Motion is functional, never decorative. Every animation either confirms an action or reveals new content. Nothing spins, bounces, or pulses unless it communicates state.</div>
+
+  <div class="comp-card">
+    <div class="comp-card-title">Timing & Easing</div>
+    <table class="motion-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>Value</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fast</td>
+          <td>130ms ease</td>
+          <td>Button press feedback, hover states, color transitions</td>
+        </tr>
+        <tr>
+          <td>base</td>
+          <td>180ms ease</td>
+          <td>Tab switches, card state changes, input focus</td>
+        </tr>
+        <tr>
+          <td>medium</td>
+          <td>250ms ease</td>
+          <td>Chevron rotation, calendar day selection</td>
+        </tr>
+        <tr>
+          <td>reveal</td>
+          <td>300ms cubic-bezier(.4,0,.2,1)</td>
+          <td>Calendar dropdown, court info accordion expand</td>
+        </tr>
+        <tr>
+          <td>sheet</td>
+          <td>320ms cubic-bezier(.32,.72,0,1)</td>
+          <td>Bottom sheet slide up, confirm screen entry</td>
+        </tr>
+        <tr>
+          <td>bar</td>
+          <td>300ms cubic-bezier(.32,.72,0,1)</td>
+          <td>Reserve bar slide up from bottom</td>
+        </tr>
+        <tr>
+          <td>stagger</td>
+          <td>200ms ease · 30ms delay per item</td>
+          <td>Slot grid entrance on date change</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="comp-note">Active / pressed states: scale(.96–.98) + opacity(.9). Never use bounce easing. Keep animations under 350ms.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 08 COMPONENTS -->
+  <div class="sec-title">08</div>
+  <div class="sec-heading">Components</div>
+  <div class="sec-body">Core reusable UI components with their specs and usage rules.</div>
+
+  <!-- Nav -->
+  <div class="comp-card" style="margin-bottom:12px;">
+    <div class="comp-card-title">Navigation Bar</div>
+    <div class="nav-demo">
+      <div class="nav-demo-brand">PickA<em style="color:var(--avail);font-style:normal;">Slot</em></div>
+      <div class="nav-demo-tabs">
+        <div class="nav-demo-tab active">Book</div>
+        <div class="nav-demo-tab inactive">My Booking</div>
+      </div>
+    </div>
+    <div class="comp-note">Sticky. Background matches --base. Active tab: --elevated background, --txt1. Inactive: --txt3. 18px padding top. Max-width 430px shell.</div>
+  </div>
+
+  <!-- Reserve Button -->
+  <div class="comp-card" style="margin-bottom:12px;">
+    <div class="comp-card-title">Reserve Bar — Primary CTA</div>
+    <div class="btn-demo btn-demo-primary">
+      <div>
+        <div class="btn-label">Reserve Court</div>
+        <div class="btn-sub">2 slots · 2 hrs</div>
+      </div>
+      <div class="btn-price">₱300</div>
+    </div>
+    <div class="comp-note">Fixed bottom. Animates in when ≥1 slot selected. Background: --accent (#F0F7F2). Text: --base. Border radius: 14px. Padding: 17px 22px. Box shadow: 0 8px 32px rgba(240,247,242,.15).</div>
+  </div>
+
+  <!-- Date Trigger -->
+  <div class="comp-card" style="margin-bottom:12px;">
+    <div class="comp-card-title">Date Picker Trigger</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:38px;height:38px;background:var(--avail-dim);border:1px solid rgba(74,222,128,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="13" rx="2.5" stroke="#4ADE80" stroke-width="1.5"/><path d="M2 7h14" stroke="#4ADE80" stroke-width="1.5"/><path d="M6 1v3M12 1v3" stroke="#4ADE80" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--txt1);">Today, May 30</div>
+          <div style="font-size:11px;font-weight:500;color:var(--txt2);margin-top:3px;">Friday · Week 22</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--avail);">Change</span>
+        <div style="width:22px;height:22px;background:var(--avail-dim);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="#4ADE80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="comp-note">Full width card. Tapping opens calendar dropdown attached to bottom edge. Border turns --avail on open state. Bottom border-color transparent to merge with dropdown panel.</div>
+  </div>
+
+  <!-- Week Day Cards -->
+  <div class="comp-card" style="margin-bottom:12px;">
+    <div class="comp-card-title">Week Day Cards</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;background:var(--card);border:1px solid var(--border);border-radius:10px;opacity:.35;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);">SUN</span>
+        <span style="font-size:16px;font-weight:700;color:var(--txt2);">25</span>
+        <div style="width:4px;height:4px;border-radius:50%;background:transparent;"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);">MON</span>
+        <span style="font-size:16px;font-weight:700;color:var(--txt2);">26</span>
+        <div style="width:4px;height:4px;border-radius:50%;background:var(--border);"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);">TUE</span>
+        <span style="font-size:16px;font-weight:700;color:var(--txt2);">27</span>
+        <div style="width:4px;height:4px;border-radius:50%;background:var(--border);"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);">WED</span>
+        <span style="font-size:16px;font-weight:700;color:var(--txt2);">28</span>
+        <div style="width:4px;height:4px;border-radius:50%;background:var(--border);"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;background:var(--card);border:1px solid rgba(74,222,128,.3);border-radius:10px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--avail);">THU</span>
+        <span style="font-size:16px;font-weight:700;color:var(--avail);">29</span>
+        <div style="width:4px;height:4px;border-radius:50%;background:transparent;"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;background:var(--avail);border:1px solid var(--avail);border-radius:10px;box-shadow:0 3px 14px rgba(74,222,128,.25);">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(15,36,24,.65);">FRI</span>
+        <span style="font-size:16px;font-weight:800;color:var(--base);">30</span>
+        <div style="width:4px;height:4px;border-radius:50%;background:rgba(15,36,24,.3);"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);">SAT</span>
+        <span style="font-size:16px;font-weight:700;color:var(--txt2);">31</span>
+        <div style="width:4px;height:4px;border-radius:50%;background:var(--border);"></div>
+      </div>
+    </div>
+    <div class="comp-note">Past days: opacity .3, no interaction. Today: --avail border + text. Active: --avail fill, --base text, glow shadow. Pip dot shows days with slots.</div>
+  </div>
+
+  <!-- Form Input -->
+  <div class="comp-card" style="margin-bottom:12px;">
+    <div class="comp-card-title">Form Input</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:8px;">Default</div>
+        <div class="input-demo" style="color:var(--txt3);">e.g. Maria</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:8px;">Focused</div>
+        <div class="input-demo focused" style="color:var(--txt1);">Maria</div>
+      </div>
+    </div>
+    <div class="comp-note">Background: --elevated. Border: --border default, --avail focused. Box shadow on focus: 0 0 0 3px rgba(74,222,128,.1). Border radius: 10px. Font: 16px / 500.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 09 SLOT STATES -->
+  <div class="sec-title">09</div>
+  <div class="sec-heading">Slot States</div>
+  <div class="sec-body">Five states. Color is always accompanied by a text label. Available slots are physically elevated — they have a box shadow that others do not. This is the primary visual cue that they are interactive.</div>
+
+  <div class="comp-card">
+    <div class="comp-card-title">All Five States</div>
+    <div class="slot-demo-grid">
+      <div class="slot-demo sd-available">
+        <div class="sd-time">6:00 <span class="sd-ampm">AM</span></div>
+        <div class="sd-bottom">
+          <span class="sd-status">Available</span>
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;"></div>
+        </div>
+      </div>
+      <div class="slot-demo sd-selected">
+        <div class="sd-time">7:00 <span class="sd-ampm">AM</span></div>
+        <div class="sd-bottom">
+          <span class="sd-status">Selected</span>
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(15,36,24,.3);background:rgba(15,36,24,.25);display:flex;align-items:center;justify-content:center;">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="rgba(15,36,24,.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="slot-demo sd-pending">
+        <div class="sd-time">8:00 <span class="sd-ampm">AM</span></div>
+        <div class="sd-bottom"><span class="sd-status">Pending</span></div>
+      </div>
+      <div class="slot-demo sd-taken">
+        <div class="sd-time">9:00 <span class="sd-ampm">AM</span></div>
+        <div class="sd-bottom"><span class="sd-status">Taken</span></div>
+      </div>
+      <div class="slot-demo sd-past">
+        <div class="sd-time">6:00 <span class="sd-ampm">AM</span></div>
+        <div class="sd-bottom"><span class="sd-status">Past</span></div>
+      </div>
+    </div>
+    <div class="comp-note">Grid is always 2 columns. Slot height is compact — time on line 1, status on line 2. Taken, Pending, and Past slots have pointer-events: none.</div>
+  </div>
+
+  <!-- State rules table -->
+  <div class="comp-card">
+    <div class="comp-card-title">State Specs</div>
+    <table class="motion-table">
+      <thead>
+        <tr><th>State</th><th>Background</th><th>Border</th><th>Interactive</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Available</td><td>--elevated (#1C3828)</td><td>--border, box-shadow</td><td>Yes — tap to select</td></tr>
+        <tr><td>Selected</td><td>--avail (#4ADE80)</td><td>--avail, glow shadow</td><td>Yes — tap to deselect</td></tr>
+        <tr><td>Pending</td><td>--pend-dim (amber 10%)</td><td>amber 15% opacity</td><td>No</td></tr>
+        <tr><td>Taken</td><td>--taken-dim (red 10%)</td><td>red 15% opacity</td><td>No</td></tr>
+        <tr><td>Past</td><td>transparent</td><td>--border2, opacity .35</td><td>No</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 10 BOOKING STATUS -->
+  <div class="sec-title">10</div>
+  <div class="sec-heading">Booking Status</div>
+  <div class="sec-body">Three possible states for a booking on the My Booking page. Each has a status banner with a glowing dot, a color, a label, and a description.</div>
+
+  <div class="comp-card">
+    <div class="comp-card-title">Status Banners</div>
+
+    <div class="status-demo" style="background:var(--avail-dim);border:1px solid rgba(74,222,128,.2);margin-bottom:8px;">
+      <div class="status-dot" style="background:var(--avail);box-shadow:0 0 8px rgba(74,222,128,.5);"></div>
+      <div>
+        <div class="status-label" style="color:var(--avail);">Confirmed</div>
+        <div class="status-desc" style="color:rgba(74,222,128,.75);">Your booking has been confirmed. See you on the court!</div>
+      </div>
+    </div>
+
+    <div class="status-demo" style="background:var(--pend-dim);border:1px solid rgba(251,191,36,.2);margin-bottom:8px;">
+      <div class="status-dot" style="background:var(--pend);box-shadow:0 0 8px rgba(251,191,36,.5);"></div>
+      <div>
+        <div class="status-label" style="color:var(--pend);">Pending Confirmation</div>
+        <div class="status-desc" style="color:rgba(251,191,36,.75);">Your booking is awaiting admin approval.</div>
+      </div>
+    </div>
+
+    <div class="status-demo" style="background:var(--taken-dim);border:1px solid rgba(248,113,113,.2);">
+      <div class="status-dot" style="background:var(--taken);box-shadow:0 0 8px rgba(248,113,113,.5);"></div>
+      <div>
+        <div class="status-label" style="color:var(--taken);">Rejected</div>
+        <div class="status-desc" style="color:rgba(248,113,113,.75);">Unfortunately your booking was not approved.</div>
+      </div>
+    </div>
+
+    <div class="comp-note">Dot always has a glow box-shadow matching its color at 50% opacity. Label is 11px / 700 / uppercase / tracked. Description is 12px / 500.</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="divider"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--txt1);">PickA<em style="color:var(--avail);font-style:normal;">Slot</em></div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--txt4);">Design System v1.0 · Sunrise Village</div>
+  </div>
+
+</div>
+</body>
+</html>
