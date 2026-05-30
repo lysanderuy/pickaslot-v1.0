@@ -57,6 +57,38 @@ function formatMoney(cents: number): string {
   return `₱${(cents / 100).toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
 }
 
+function calendarDateKey(value: string): string {
+  const date = localCalendarDate(value);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function groupSlotsByDate(slots: Slot[], bookingDate: string) {
+  const groups = new Map<string, Slot[]>();
+
+  for (const slot of slots) {
+    const key = calendarDateKey(slot.slot_start_at);
+    const list = groups.get(key) ?? [];
+    list.push(slot);
+    groups.set(key, list);
+  }
+
+  return [...groups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, groupSlots]) => {
+      const sorted = [...groupSlots].sort(
+        (a, b) => new Date(a.slot_start_at).getTime() - new Date(b.slot_start_at).getTime()
+      );
+      return {
+        key,
+        label: slotDateLabel(bookingDate, sorted[0].slot_start_at),
+        slots: sorted,
+      };
+    });
+}
+
 export function BookingCard({
   bookingCode,
   fullName,
@@ -66,10 +98,10 @@ export function BookingCard({
   bookingDate,
   pricePerHourCents,
 }: BookingCardProps) {
-  const dateLabel = slotDateLabel(bookingDate, slots[0]?.slot_start_at);
   const pricePerSlot = formatMoney(pricePerHourCents);
   const total = formatMoney(totalCostCents);
   const payIcon = PAY_ICON[paymentMethod] ?? "";
+  const slotGroups = groupSlotsByDate(slots, bookingDate);
 
   return (
     <div className="overflow-hidden rounded-[14px] border border-[#2A4A35] bg-[#162E20]">
@@ -90,19 +122,28 @@ export function BookingCard({
       {/* Slots */}
       <div className="border-b border-[#2A4A35] px-4 py-4 sm:px-5">
         <p className={`${tw.sectionLabel} mb-2`}>Reserved Slots</p>
-        {slots.map((slot) => (
-          <div
-            key={slot.slot_start_at}
-            className="flex flex-col gap-1 border-b border-[#1F3D29] py-2.5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:py-2"
-          >
-            <span className="text-sm font-bold tracking-[-0.01em] text-[#F0F7F2] sm:text-[15px]">
-              {formatTimeRange(slot.slot_start_at, slot.slot_end_at)}
-            </span>
-            <span className="font-mono text-[11px] text-[#4A6B55]">
-              {dateLabel} · 1 hr · {pricePerSlot}
-            </span>
-          </div>
-        ))}
+        <div className="space-y-3">
+          {slotGroups.map((group) => (
+            <div key={group.key}>
+              <p className="mb-1.5 text-[13px] font-bold tracking-[-0.01em] text-[#8AAF95]">
+                {group.label}
+              </p>
+              {group.slots.map((slot) => (
+                <div
+                  key={slot.slot_start_at}
+                  className="flex items-center justify-between gap-3 border-b border-[#1F3D29] py-2 last:border-b-0"
+                >
+                  <span className="min-w-0 text-sm font-bold tracking-[-0.01em] text-[#F0F7F2] sm:text-[15px]">
+                    {formatTimeRange(slot.slot_start_at, slot.slot_end_at)}
+                  </span>
+                  <span className="shrink-0 font-mono text-[11px] text-[#4A6B55]">
+                    1 hr · {pricePerSlot}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Payment + total */}
