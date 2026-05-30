@@ -1,5 +1,6 @@
 import { BadRequestError, NotFoundError } from "@/lib/errors";
 import { getDataSource } from "@/lib/db";
+import { rethrowPgBusinessRule } from "@/lib/db/pg-errors";
 import type {
   CreateBookingRequestInput,
   DayAvailabilityRow,
@@ -25,20 +26,26 @@ export async function createBookingRequest(input: CreateBookingRequestInput) {
   }
 
   const db = await getDataSource();
-  const rows = (await db.query(
-    `
-      select *
-      from public.create_booking_request(
-        $1::uuid,
-        $2::date,
-        $3::text,
-        $4::text,
-        $5::payment_method,
-        $6::timestamptz[]
-      )
-    `,
-    [courtId, bookingDate, fullName, contactNumber, input.paymentMethod, input.slotStarts],
-  )) as Array<Record<string, unknown>>;
+
+  let rows: Array<Record<string, unknown>>;
+  try {
+    rows = (await db.query(
+      `
+        select *
+        from public.create_booking_request(
+          $1::uuid,
+          $2::date,
+          $3::text,
+          $4::text,
+          $5::payment_method,
+          $6::timestamptz[]
+        )
+      `,
+      [courtId, bookingDate, fullName, contactNumber, input.paymentMethod, input.slotStarts],
+    )) as Array<Record<string, unknown>>;
+  } catch (error) {
+    rethrowPgBusinessRule(error);
+  }
 
   if (rows.length === 0) {
     throw new Error("Booking request failed without a response");

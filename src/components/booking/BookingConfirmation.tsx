@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { cx } from "@/lib/cx";
 import { formatTimeRange } from "@/lib/bookings/formatting";
+import { tw } from "@/lib/ui/tokens";
 import type { AvailabilityRow } from "@/types/bookings";
 
 interface BookingConfirmationProps {
@@ -25,6 +27,20 @@ export function BookingConfirmation({
   timezone,
   onClose,
 }: BookingConfirmationProps) {
+  const [copied, setCopied] = useState(false);
+  const slotListScrollable = slots.length > 4;
+
+  async function handleCopyCode() {
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard unavailable */
+    }
+  }
+
   return (
     <>
       {/* Backdrop */}
@@ -74,31 +90,71 @@ export function BookingConfirmation({
           </p>
         </div>
 
-        {/* Body - scrollable */}
+        {/* Body */}
         <div className="min-h-0 flex-1 overflow-y-auto px-[22px] pb-5 pt-5 [scrollbar-width:none] md:pb-6 md:pt-6">
-          {/* Booking code card */}
+          {/* Booking code */}
           <div className="relative mb-4 overflow-hidden rounded-2xl border border-[#2A4A35] bg-[#162E20] p-[18px]">
-            {/* Green top-accent bar per design */}
             <div className="absolute left-0 right-0 top-0 h-0.5 bg-[linear-gradient(90deg,#4ADE80,transparent)]" />
 
-            <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#4A6B55]">
-              Your Booking Code
+            <div className={tw.sectionLabel}>Your Booking Code</div>
+            <div className="mt-2.5 flex items-center justify-between gap-3">
+              <div className="min-w-0 font-mono text-[36px] font-medium leading-none tracking-[0.06em] text-[#4ADE80] md:text-[42px]">
+                {code || "..."}
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyCode}
+                disabled={!code}
+                aria-label={copied ? "Booking code copied" : "Copy booking code"}
+                className="flex shrink-0 items-center gap-1.5 rounded-[10px] border border-[#2A4A35] bg-[#1C3828] px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8AAF95] transition-[background-color,color,opacity] duration-[150ms] active:bg-[#243D2E] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {copied ? (
+                  "Copied!"
+                ) : (
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                      <path d="M10.5 5.5V4a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5" />
+                    </svg>
+                    Copy
+                  </>
+                )}
+              </button>
             </div>
-            <div className="mb-4 mt-2.5 font-mono text-[36px] font-medium leading-none tracking-[0.06em] text-[#4ADE80] md:text-[42px]">
-              {code || "..."}
-            </div>
+          </div>
 
-            {/* Slot list */}
-            <div className="flex flex-col gap-[7px] border-t border-[#2A4A35] pt-[13px]">
+          {/* Slot list */}
+          <div className="mb-4 rounded-xl border border-[#2A4A35] bg-[#162E20] px-4 py-3.5">
+            <div className={cx(tw.sectionLabel, "mb-2.5 flex items-center justify-between gap-2")}>
+              <span>Your Selection</span>
+              {slotListScrollable && (
+                <span className="font-mono text-[10px] font-normal normal-case tracking-[0.02em] text-[#4A6B55]">
+                  {slots.length} slots
+                </span>
+              )}
+            </div>
+            <div
+              className={cx(
+                slotListScrollable &&
+                  "max-h-[min(24vh,168px)] overflow-y-auto overscroll-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              )}
+            >
               {slots.map((slot) => (
                 <div
                   key={slot.slot_start_at}
-                  className="flex items-center justify-between"
+                  className="flex items-center justify-between gap-3 border-b border-[#1F3D29] py-[7px] last:border-b-0"
                 >
-                  <span className="text-sm font-semibold text-[#F0F7F2]">
+                  <span className="min-w-0 text-sm font-semibold text-[#F0F7F2]">
                     {formatTimeRange(slot.slot_start_at, slot.slot_end_at, timezone)}
                   </span>
-                  <span className="font-mono text-[11px] font-normal text-[#4A6B55]">
+                  <span className="shrink-0 font-mono text-[11px] font-normal text-[#4A6B55]">
                     1 hr · {priceLabel}
                   </span>
                 </div>
