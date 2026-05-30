@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     const booking = await lookupBookingByCode(bookingCode);
     return NextResponse.json({ booking });
   } catch (error) {
+    console.error("[Lookup API Error]", error);
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
