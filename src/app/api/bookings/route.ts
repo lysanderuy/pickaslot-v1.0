@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     const courtId = body.courtId;
     const bookingDate = body.bookingDate;
-    const firstName = body.firstName;
+    const fullName = body.fullName;
     const contactNumber = body.contactNumber;
     const paymentMethod = body.paymentMethod;
     const slotStarts = body.slotStarts;
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (
       typeof courtId !== "string" ||
       typeof bookingDate !== "string" ||
-      typeof firstName !== "string" ||
+      typeof fullName !== "string" ||
       typeof contactNumber !== "string" ||
       (paymentMethod !== PaymentMethod.Cash && paymentMethod !== PaymentMethod.GCash) ||
       !Array.isArray(slotStarts) ||
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const booking = await createBookingRequest({
       courtId,
       bookingDate,
-      firstName,
+      fullName,
       contactNumber,
       paymentMethod,
       slotStarts,
@@ -46,12 +46,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ booking }, { status: 201 });
   } catch (error) {
+    console.error("[Booking API Error]", error);
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json(
-      { error: "Failed to create booking" },
+      { error: "Failed to create booking", details: error instanceof Error ? error.message : String(error) },
       { status: 500 },
     );
   }

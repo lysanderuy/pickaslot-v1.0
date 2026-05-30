@@ -23,14 +23,14 @@ export interface AvailabilityRow {
   slot_state: SlotState;
   booking_id: string | null;
   booking_code: string | null;
-  first_name: string | null;
+  full_name: string | null;
   payment_method: PaymentMethod | null;
   total_cost_cents: number | null;
 }
 
 export interface PublicBookingLookupResult {
   booking_code: string;
-  first_name: string;
+  full_name: string;
   status: "pending" | "confirmed" | "rejected";
   payment_method: PaymentMethod;
   price_per_hour_cents: number;
@@ -45,7 +45,7 @@ export interface PublicBookingLookupResult {
 export interface ConfirmedReservation {
   bookingId: string;
   timeRange: string;
-  firstName: string;
+  fullName: string;
   duration: number;
   totalCostCents: number;
 }
@@ -65,7 +65,7 @@ export interface BookingResponse {
 export interface CreateBookingRequestInput {
   courtId: string;
   bookingDate: string;
-  firstName: string;
+  fullName: string;
   contactNumber: string;
   paymentMethod: PaymentMethod;
   slotStarts: string[];

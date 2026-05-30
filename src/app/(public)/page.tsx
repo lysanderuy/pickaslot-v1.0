@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { cx } from "@/lib/cx";
 import { formatMoney, formatClockValue } from "@/lib/bookings/formatting";
+import { isSoon } from "@/lib/bookings/availability";
 import { toDateKey } from "@/lib/date/utils";
 import { getToday } from "@/lib/date/calendar";
 import { Nav } from "@/components/Nav";
@@ -27,11 +28,6 @@ import type {
 
 const cardClass = "border border-[#2A4A35] bg-[#162E20]";
 
-function isSoon(row: AvailabilityRow) {
-  const diffMinutes = (new Date(row.slot_start_at).getTime() - Date.now()) / 60000;
-  return diffMinutes >= 0 && diffMinutes <= 60;
-}
-
 export default function BookPage() {
   const [court, setCourt] = useState<Court | null>(null);
   const [courtError, setCourtError] = useState("");
@@ -48,7 +44,7 @@ export default function BookPage() {
   const [selectedSlotStarts, setSelectedSlotStarts] = useState<string[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [warningOpen, setWarningOpen] = useState(false);
-  const [firstName, setFirstName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("gcash");
   const [submitError, setSubmitError] = useState("");
@@ -178,7 +174,7 @@ export default function BookPage() {
 
   function openSheet() {
     setSubmitError("");
-    if (selectedSlots.some(isSoon)) {
+    if (selectedSlots.some((row) => isSoon(row))) {
       setWarningOpen(true);
       return;
     }
@@ -196,7 +192,7 @@ export default function BookPage() {
       setSubmitError("Court details are still loading. Please try again.");
       return;
     }
-    if (!firstName.trim() || !contactNumber.trim()) {
+    if (!fullName.trim() || !contactNumber.trim()) {
       setSubmitError("Please fill in your name and contact number.");
       return;
     }
@@ -214,7 +210,7 @@ export default function BookPage() {
         body: JSON.stringify({
           courtId: court.id,
           bookingDate: selectedDateKey,
-          firstName: firstName.trim(),
+          fullName: fullName.trim(),
           contactNumber: contactNumber.trim(),
           paymentMethod,
           slotStarts: selectedSlots.map((slot) => slot.slot_start_at),
@@ -228,7 +224,7 @@ export default function BookPage() {
       setConfirmation({ code, slots: selectedSlots });
       setSheetOpen(false);
       setSelectedSlotStarts([]);
-      setFirstName("");
+      setFullName("");
       setContactNumber("");
       await loadAvailability(court, selectedDateKey);
     } catch (error) {
@@ -367,7 +363,7 @@ export default function BookPage() {
             />
           </div>
 
-          <div className="lg:sticky lg:top-20 lg:self-start">
+          <div className="lg:sticky lg:top-20 lg:self-start lg:h-fit">
             <ReservationList
               availability={availability}
               timezone={court.timezone}
@@ -397,8 +393,8 @@ export default function BookPage() {
         timezone={court.timezone}
         priceLabel={priceLabel}
         onSubmit={submitBooking}
-        firstName={firstName}
-        setFirstName={setFirstName}
+        fullName={fullName}
+        setFullName={setFullName}
         contactNumber={contactNumber}
         setContactNumber={setContactNumber}
         paymentMethod={paymentMethod}

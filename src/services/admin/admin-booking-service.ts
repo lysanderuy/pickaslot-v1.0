@@ -30,7 +30,7 @@ export async function listAdminBookings(filters: BookingListFilters = {}) {
         b.id,
         b.booking_code,
         b.booking_date,
-        b.first_name,
+        b.full_name,
         b.contact_number,
         b.payment_method,
         b.status,

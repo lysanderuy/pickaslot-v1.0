@@ -13,7 +13,7 @@ interface Slot {
 interface BookingResultProps {
   status: BookingStatus;
   bookingCode: string;
-  firstName: string;
+  fullName: string;
   slots: Slot[];
   paymentMethod: PaymentMethod;
   totalCostCents: number;
@@ -25,7 +25,7 @@ interface BookingResultProps {
 export function BookingResult({
   status,
   bookingCode,
-  firstName,
+  fullName,
   slots,
   paymentMethod,
   totalCostCents,
@@ -43,7 +43,7 @@ export function BookingResult({
       {/* Booking card */}
       <BookingCard
         bookingCode={bookingCode}
-        firstName={firstName}
+        fullName={fullName}
         slots={slots}
         paymentMethod={paymentMethod}
         totalCostCents={totalCostCents}

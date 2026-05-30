@@ -17,7 +17,7 @@ function ensureString(value: string | undefined, message: string): string {
 export async function createBookingRequest(input: CreateBookingRequestInput) {
   const courtId = ensureString(input.courtId, "Court is required");
   const bookingDate = ensureString(input.bookingDate, "Booking date is required");
-  const firstName = ensureString(input.firstName, "First name is required");
+  const fullName = ensureString(input.fullName, "Full name is required");
   const contactNumber = ensureString(input.contactNumber, "Contact number is required");
 
   if (input.slotStarts.length === 0) {
@@ -37,7 +37,7 @@ export async function createBookingRequest(input: CreateBookingRequestInput) {
         $6::timestamptz[]
       )
     `,
-    [courtId, bookingDate, firstName, contactNumber, input.paymentMethod, input.slotStarts],
+    [courtId, bookingDate, fullName, contactNumber, input.paymentMethod, input.slotStarts],
   )) as Array<Record<string, unknown>>;
 
   if (rows.length === 0) {

@@ -33,8 +33,8 @@ export class BookingEntity {
   @Column({ name: "booking_date", type: "date" })
   bookingDate!: string;
 
-  @Column({ name: "first_name", type: "text" })
-  firstName!: string;
+  @Column({ name: "full_name", type: "text" })
+  fullName!: string;
 
   @Column({ name: "contact_number", type: "text" })
   contactNumber!: string;

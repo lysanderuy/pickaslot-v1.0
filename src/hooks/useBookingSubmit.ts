@@ -11,7 +11,7 @@ interface UseBookingSubmitResult {
   submitting: boolean;
   submitError: string;
   confirmation: Confirmation | null;
-  submitBooking: (firstName: string, contactNumber: string, paymentMethod: PaymentMethod) => Promise<boolean>;
+  submitBooking: (fullName: string, contactNumber: string, paymentMethod: PaymentMethod) => Promise<boolean>;
   clearConfirmation: () => void;
 }
 
@@ -21,8 +21,8 @@ export function useBookingSubmit(options: UseBookingSubmitOptions): UseBookingSu
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const submitBooking = useCallback(
-    async (firstName: string, contactNumber: string, paymentMethod: PaymentMethod): Promise<boolean> => {
-      if (!firstName.trim() || !contactNumber.trim()) {
+    async (fullName: string, contactNumber: string, paymentMethod: PaymentMethod): Promise<boolean> => {
+      if (!fullName.trim() || !contactNumber.trim()) {
         setSubmitError("Please fill in your name and contact number.");
         return false;
       }
@@ -37,7 +37,7 @@ export function useBookingSubmit(options: UseBookingSubmitOptions): UseBookingSu
           body: JSON.stringify({
             courtId: options.courtId,
             bookingDate: options.bookingDate,
-            firstName: firstName.trim(),
+            fullName: fullName.trim(),
             contactNumber: contactNumber.trim(),
             paymentMethod,
             slotStarts: options.slotStarts,
@@ -57,7 +57,7 @@ export function useBookingSubmit(options: UseBookingSubmitOptions): UseBookingSu
           slot_state: "pending",
           booking_id: null,
           booking_code: null,
-          first_name: null,
+          full_name: null,
           payment_method: null,
           total_cost_cents: null,
         }));

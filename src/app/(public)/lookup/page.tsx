@@ -72,7 +72,7 @@ function LookupContent() {
     if (!CODE_RE.test(trimmed)) {
       setErrorTitle("Invalid code format");
       setErrorSub(
-        "Booking codes look like 1234-XK9 — four digits, a dash, then three characters. Double-check and try again."
+        "Booking codes look like 1234-XK9: four digits, a dash, then three characters. Double-check and try again."
       );
       setState("error");
       return;
@@ -156,7 +156,7 @@ function LookupContent() {
             <BookingResult
               status={booking.status as BookingStatus}
               bookingCode={booking.booking_code}
-              firstName={booking.first_name}
+              fullName={booking.full_name}
               slots={booking.slots}
               paymentMethod={booking.payment_method as PaymentMethod}
               totalCostCents={booking.total_cost_cents}

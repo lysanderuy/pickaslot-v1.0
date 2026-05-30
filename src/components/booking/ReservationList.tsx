@@ -45,7 +45,7 @@ export function ReservationList({
 
       return {
         bookingId,
-        firstName: first?.first_name ?? "Guest",
+        fullName: first?.full_name ?? "Guest",
         duration: sorted.length,
         timeRange: first && last ? formatTimeRange(first.slot_start_at, last.slot_end_at, timezone) : "",
         totalCostCents: first?.total_cost_cents ?? sorted.length * pricePerHourCents,
@@ -98,7 +98,7 @@ export function ReservationList({
                     {reservation.timeRange}
                   </div>
                   <div className="mt-[3px] text-xs font-medium italic text-[#8AAF95]">
-                    {reservation.firstName}
+                    {reservation.fullName}
                   </div>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-0.5 ml-3">

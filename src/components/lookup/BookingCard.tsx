@@ -10,7 +10,7 @@ interface Slot {
 
 interface BookingCardProps {
   bookingCode: string;
-  firstName: string;
+  fullName: string;
   slots: Slot[];
   paymentMethod: PaymentMethod;
   totalCostCents: number;
@@ -21,13 +21,23 @@ interface BookingCardProps {
 const PAY_ICON: Record<string, string> = { gcash: "💳", cash: "💵" };
 const PAY_LABEL: Record<string, string> = { gcash: "GCash", cash: "Cash" };
 
-function slotDateLabel(bookingDate: string): string {
+function localCalendarDate(value: string): Date {
+  const dateOnly = value.slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+    const [y, m, d] = dateOnly.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  const parsed = new Date(value);
+  return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+}
+
+function slotDateLabel(bookingDate: string, firstSlotStart?: string): string {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-  const [y, m, d] = bookingDate.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
+  const date = firstSlotStart ? localCalendarDate(firstSlotStart) : localCalendarDate(bookingDate);
   if (date.getTime() === today.getTime()) return "Today";
   if (date.getTime() === tomorrow.getTime()) return "Tomorrow";
   return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(date);
@@ -40,7 +50,7 @@ function formatSlotTime(iso: string): string {
 }
 
 function formatTimeRange(start: string, end: string): string {
-  return `${formatSlotTime(start)} – ${formatSlotTime(end)}`;
+  return `${formatSlotTime(start)} - ${formatSlotTime(end)}`;
 }
 
 function formatMoney(cents: number): string {
@@ -49,14 +59,14 @@ function formatMoney(cents: number): string {
 
 export function BookingCard({
   bookingCode,
-  firstName,
+  fullName,
   slots,
   paymentMethod,
   totalCostCents,
   bookingDate,
   pricePerHourCents,
 }: BookingCardProps) {
-  const dateLabel = slotDateLabel(bookingDate);
+  const dateLabel = slotDateLabel(bookingDate, slots[0]?.slot_start_at);
   const pricePerSlot = formatMoney(pricePerHourCents);
   const total = formatMoney(totalCostCents);
   const payIcon = PAY_ICON[paymentMethod] ?? "";
@@ -73,7 +83,7 @@ export function BookingCard({
         </div>
         <div className="flex flex-col items-end gap-[3px]">
           <span className={tw.sectionLabel}>Name</span>
-          <span className="text-base font-bold tracking-[-0.01em] text-[#F0F7F2]">{firstName}</span>
+          <span className="text-base font-bold tracking-[-0.01em] text-[#F0F7F2]">{fullName}</span>
         </div>
       </div>
 
