@@ -15,18 +15,27 @@ export function ReserveBar({ selectedSlots, totalCostCents, currencyCode, onClic
   const slotCount = selectedSlots.length;
 
   return (
-    <div
-      className={cx(
-        "pointer-events-none fixed bottom-0 left-0 right-0 z-50 bg-[linear-gradient(to_top,#0F2418_55%,transparent)] pb-9 pt-3 transition",
-        slotCount > 0 ? "pointer-events-auto translate-y-0" : "translate-y-[110%]"
-      )}
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <button
-          type="button"
-          className="flex w-full items-center justify-between rounded-[14px] bg-[#F0F7F2] px-[22px] py-[17px] shadow-[0_8px_32px_rgba(240,247,242,0.15),0_2px_8px_rgba(0,0,0,0.3)] active:scale-[0.98]"
-          onClick={onClick}
-        >
+    <>
+      {/* Gradient backdrop - non-interactive */}
+      <div
+        className={cx(
+          "pointer-events-none fixed bottom-0 left-0 right-0 z-[60] bg-[linear-gradient(to_top,#0F2418_55%,transparent)] pb-9 pt-3 transition",
+          slotCount > 0 ? "translate-y-0" : "translate-y-[110%]"
+        )}
+      />
+      {/* Clickable bar content */}
+      <div
+        className={cx(
+          "fixed bottom-0 left-0 right-0 z-[70] pb-9 pt-3 transition",
+          slotCount > 0 ? "translate-y-0 pointer-events-auto" : "translate-y-[110%] pointer-events-none"
+        )}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between rounded-[14px] bg-[#F0F7F2] px-[22px] py-[17px] shadow-[0_8px_32px_rgba(240,247,242,0.15),0_2px_8px_rgba(0,0,0,0.3)] active:scale-[0.98]"
+            onClick={onClick}
+          >
           <span className="flex flex-col gap-0.5 text-left">
             <span className="text-[15px] font-extrabold tracking-[-0.01em] text-[#0F2418]">
               Reserve Court
@@ -44,7 +53,8 @@ export function ReserveBar({ selectedSlots, totalCostCents, currencyCode, onClic
             </span>
           </span>
         </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
