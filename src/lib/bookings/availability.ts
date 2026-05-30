@@ -1,8 +1,18 @@
 import type { AvailabilityRow } from "@/types/bookings";
 
 export function isSoon(row: AvailabilityRow, now: Date = new Date()): boolean {
-  const diffMinutes = (new Date(row.slot_start_at).getTime() - now.getTime()) / 60000;
-  return diffMinutes >= 0 && diffMinutes <= 60;
+  const nowMs = now.getTime();
+  const slotStart = new Date(row.slot_start_at).getTime();
+  const slotEnd = new Date(row.slot_end_at).getTime();
+
+  // Slot must not have ended yet
+  if (nowMs >= slotEnd) {
+    return false;
+  }
+
+  // Warning if slot starts within 60 minutes (past or future)
+  const diffMinutes = (slotStart - nowMs) / 60000;
+  return diffMinutes <= 60;
 }
 
 export function uiSlotState(slotState: AvailabilityRow["slot_state"]): "available" | "pending" | "taken" | "past" {
