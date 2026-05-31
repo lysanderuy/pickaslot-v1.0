@@ -30,10 +30,26 @@ export async function PATCH(
         typeof body.isAcceptingBookings === "boolean"
           ? body.isAcceptingBookings
           : undefined,
+      acceptsGcash:
+        typeof body.acceptsGcash === "boolean"
+          ? body.acceptsGcash
+          : undefined,
+      acceptsCash:
+        typeof body.acceptsCash === "boolean"
+          ? body.acceptsCash
+          : undefined,
       houseRules: typeof body.houseRules === "string" ? body.houseRules : undefined,
-      paymentInstructions:
-        typeof body.paymentInstructions === "string"
-          ? body.paymentInstructions
+      gcashNumber:
+        body.gcashNumber === null || typeof body.gcashNumber === "string"
+          ? (body.gcashNumber as string | null)
+          : undefined,
+      gcashName:
+        body.gcashName === null || typeof body.gcashName === "string"
+          ? (body.gcashName as string | null)
+          : undefined,
+      messengerUrl:
+        body.messengerUrl === null || typeof body.messengerUrl === "string"
+          ? (body.messengerUrl as string | null)
           : undefined,
     });
 

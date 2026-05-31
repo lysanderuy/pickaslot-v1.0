@@ -13,8 +13,12 @@ export interface Court {
   pricePerHourCents: number;
   currencyCode: string;
   isAcceptingBookings: boolean;
+  acceptsGcash: boolean;
+  acceptsCash: boolean;
   houseRules: string;
-  paymentInstructions: string;
+  gcashNumber: string | null;
+  gcashName: string | null;
+  messengerUrl: string | null;
 }
 
 export interface AvailabilityRow {
@@ -25,7 +29,7 @@ export interface AvailabilityRow {
   booking_code: string | null;
   full_name: string | null;
   payment_method: PaymentMethod | null;
-  total_cost_cents: number | null;
+  total_amount: number | null;
 }
 
 export interface PublicBookingLookupResult {
@@ -34,8 +38,12 @@ export interface PublicBookingLookupResult {
   status: "pending" | "confirmed" | "rejected";
   payment_method: PaymentMethod;
   price_per_hour_cents: number;
-  total_cost_cents: number;
+  total_amount: number;
   booking_date: string;
+  court_timezone: string;
+  gcash_number: string | null;
+  gcash_name: string | null;
+  messenger_url: string | null;
   slots: Array<{
     slot_start_at: string;
     slot_end_at: string;
@@ -47,18 +55,18 @@ export interface ConfirmedReservation {
   timeRange: string;
   fullName: string;
   duration: number;
-  totalCostCents: number;
+  totalAmount: number;
 }
 
 export interface Confirmation {
   code: string;
   slots: AvailabilityRow[];
+  paymentMethod: PaymentMethod;
 }
 
 export interface BookingResponse {
   booking: {
-    booking_code?: string;
-    bookingCode?: string;
+    booking_code: string;
   };
 }
 
@@ -69,11 +77,4 @@ export interface CreateBookingRequestInput {
   contactNumber: string;
   paymentMethod: PaymentMethod;
   slotStarts: string[];
-}
-
-export interface DayAvailabilityRow {
-  slot_start_at: string;
-  slot_end_at: string;
-  slot_state: SlotState;
-  booking_id: string | null;
 }

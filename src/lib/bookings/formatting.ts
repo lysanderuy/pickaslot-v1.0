@@ -1,6 +1,5 @@
-export function formatMoney(cents: number, currencyCode: string = "PHP"): string {
-  const amount = cents / 100;
-
+// price_per_hour_cents stores PHP directly (not cents) - e.g., 200 means ₱200/hour
+export function formatMoney(amount: number, currencyCode: string = "PHP"): string {
   if (currencyCode === "PHP") {
     return `₱${amount.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
   }
