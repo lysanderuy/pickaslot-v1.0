@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, DM_Mono } from "next/font/google";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const jakartaSans = Plus_Jakarta_Sans({
@@ -15,13 +16,12 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PickASlot – Book Your Pickleball Slot",
-  description:
-    "Reserve your court time at Villa Del Rio Pickleball Court. Quick booking, real-time availability, no hassle.",
+  metadataBase: new URL("https://pickaslot.vercel.app"),
+  title: "PickASlot · Villa del Rio Court Booking System",
+  description: "Book your Tennis or Pickleball slots at Villa del Rio Court.",
   openGraph: {
-    title: "PickASlot – Book Your Pickleball Slot",
-    description:
-      "Reserve your court time at Villa Del Rio Pickleball Court. Quick booking, real-time availability, no hassle.",
+    title: "PickASlot · Villa del Rio Court Booking System",
+    description: "Book your Tennis or Pickleball slots at Villa del Rio Court.",
     siteName: "PickASlot",
     images: [
       {
@@ -34,9 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "PickASlot – Book Your Pickleball Slot",
+    title: "PickASlot · Villa del Rio",
     description:
-      "Reserve your court time at Villa Del Rio Pickleball Court. Quick booking, real-time availability, no hassle.",
+      "Book your Tennis or Pickleball slots at Villa del Rio Court.",
     images: ["/og-image.png"],
   },
 };
@@ -51,7 +51,9 @@ export default function RootLayout({
       lang="en"
       className={`${jakartaSans.variable} ${dmMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
