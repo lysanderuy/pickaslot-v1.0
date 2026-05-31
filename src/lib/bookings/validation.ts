@@ -1,4 +1,4 @@
-export const BOOKING_CODE_REGEX = /^[0-9]{4}-[A-Z0-9]{3}$/;
+export const BOOKING_CODE_REGEX = /^[0-9]{5}$/;
 
 export interface ValidationResult {
   valid: boolean;
@@ -6,27 +6,33 @@ export interface ValidationResult {
 }
 
 export function validateBookingCode(code: string): ValidationResult {
-  const trimmed = code.trim().toUpperCase();
+  const trimmed = code.trim();
   if (!trimmed) {
     return { valid: false, error: "Code is required" };
   }
   if (!BOOKING_CODE_REGEX.test(trimmed)) {
     return {
       valid: false,
-      error: "Booking codes look like 1234-XK9: four digits, a dash, then three characters.",
+      error: "Booking codes are 5 digits, e.g. 00042.",
     };
   }
   return { valid: true };
 }
 
-export function validatePhone(phone: string): ValidationResult {
-  const trimmed = phone.trim();
-  if (!trimmed) {
-    return { valid: false, error: "Phone number is required" };
+export type LookupInputType = "code" | "invalid";
+
+export function detectLookupInput(raw: string): {
+  type: LookupInputType;
+  value: string;
+  error?: string;
+} {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 5) {
+    return { type: "code", value: digits };
   }
-  const digits = trimmed.replace(/\D/g, "");
-  if (digits.length < 10) {
-    return { valid: false, error: "Please enter a valid phone number" };
-  }
-  return { valid: true };
+  return {
+    type: "invalid",
+    value: raw,
+    error: "Enter your 5-digit booking code.",
+  };
 }
