@@ -3,24 +3,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { lookupBookingByCode } from "@/services/bookings/public-booking-service";
 import { AppError, BadRequestError } from "@/lib/errors";
 
-function extractBookingCode(body: unknown) {
+function extractBookingCode(body: unknown): string {
   if (!body || typeof body !== "object") {
     throw new BadRequestError("Invalid request body");
   }
 
-  const value = (body as Record<string, unknown>).bookingCode;
+  const b = body as Record<string, unknown>;
 
-  if (typeof value !== "string") {
-    throw new BadRequestError("Booking code is required");
-  }
+  if (typeof b.bookingCode === "string") return b.bookingCode;
 
-  return value;
+  throw new BadRequestError("bookingCode is required");
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const bookingCode = extractBookingCode(await request.json());
-    const booking = await lookupBookingByCode(bookingCode);
+    const code = extractBookingCode(await request.json());
+    const booking = await lookupBookingByCode(code);
     return NextResponse.json({ booking });
   } catch (error) {
     console.error("[Lookup API Error]", error);

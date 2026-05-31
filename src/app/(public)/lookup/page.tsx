@@ -9,12 +9,11 @@ import { EmptyState } from "@/components/lookup/EmptyState";
 import { ErrorCard } from "@/components/lookup/ErrorCard";
 import { BookingResult } from "@/components/lookup/BookingResult";
 import { LookupResultSkeleton } from "@/components/lookup/LookupResultSkeleton";
+import { detectLookupInput } from "@/lib/bookings/validation";
 import type { PublicBookingLookupResult, PaymentMethod } from "@/types/bookings";
 import type { BookingStatus } from "@/components/lookup/StatusBanner";
 
 type LookupState = "idle" | "loading" | "result" | "error";
-
-const CODE_RE = /^[0-9]{4}-[A-Z0-9]{3}$/;
 
 export default function LookupPage() {
   return (
@@ -26,20 +25,20 @@ export default function LookupPage() {
 
 function LookupContent() {
   const searchParams = useSearchParams();
-  const code = searchParams.get("code")?.toUpperCase() ?? "";
+  const query = searchParams.get("q") ?? searchParams.get("code") ?? "";
 
-  const [input, setInput] = useState(code);
-  const [state, setState] = useState<LookupState>(code ? "loading" : "idle");
+  const [input, setInput] = useState(query);
+  const [state, setState] = useState<LookupState>(query ? "loading" : "idle");
   const [booking, setBooking] = useState<PublicBookingLookupResult | null>(null);
   const [errorTitle, setErrorTitle] = useState("");
   const [errorSub, setErrorSub] = useState("");
 
-  const [prevCode, setPrevCode] = useState(code);
+  const [prevQuery, setPrevQuery] = useState(query);
 
-  if (code !== prevCode) {
-    setPrevCode(code);
-    setInput(code);
-    if (!code) {
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    setInput(query);
+    if (!query) {
       setState("idle");
       setBooking(null);
     } else {
@@ -48,44 +47,47 @@ function LookupContent() {
   }
 
   useEffect(() => {
-    if (code) {
-      void doLookup(code);
+    if (query) {
+      void doLookup(query);
     }
-  }, [code]);
+  }, [query]);
 
-  async function doLookup(code: string) {
-    const trimmed = code.trim().toUpperCase();
+  async function doLookup(raw: string) {
+    const trimmed = raw.trim();
 
     if (!trimmed) {
       setState("idle");
       return;
     }
 
-    // Sync browser URL search parameters with the queried code
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      if (url.searchParams.get("code") !== trimmed) {
-        url.searchParams.set("code", trimmed);
-        window.history.pushState({}, "", url.toString());
-      }
-    }
+    const detected = detectLookupInput(trimmed);
 
-    if (!CODE_RE.test(trimmed)) {
-      setErrorTitle("Invalid code format");
-      setErrorSub(
-        "Booking codes look like 1234-XK9: four digits, a dash, then three characters. Double-check and try again."
-      );
+    if (detected.type === "invalid") {
+      setErrorTitle("Invalid input");
+      setErrorSub(detected.error!);
       setState("error");
       return;
     }
 
+    // Sync URL
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("q") !== trimmed) {
+        url.searchParams.delete("code");
+        url.searchParams.set("q", trimmed);
+        window.history.pushState({}, "", url.toString());
+      }
+    }
+
     setState("loading");
+
+    const body = { bookingCode: detected.value };
 
     try {
       const response = await fetch("/api/bookings/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingCode: trimmed }),
+        body: JSON.stringify(body),
       });
       const payload = (await response.json()) as { booking?: PublicBookingLookupResult; error?: string };
 
@@ -93,7 +95,9 @@ function LookupContent() {
         if (response.status === 404) {
           setErrorTitle("Booking not found");
           setErrorSub(
-            "We couldn't find a booking with that code. Make sure you entered it exactly as shown on your confirmation screen."
+            detected.type === "code"
+              ? "We couldn't find an upcoming booking with that code."
+              : "No upcoming booking found for that number.",
           );
         } else {
           setErrorTitle("Lookup failed");
@@ -105,7 +109,7 @@ function LookupContent() {
 
       if (!payload.booking) {
         setErrorTitle("Booking not found");
-        setErrorSub("We couldn't find a booking with that code.");
+        setErrorSub("No upcoming booking found.");
         setState("error");
         return;
       }
@@ -129,10 +133,9 @@ function LookupContent() {
     setBooking(null);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
-      if (url.searchParams.has("code")) {
-        url.searchParams.delete("code");
-        window.history.pushState({}, "", url.toString());
-      }
+      url.searchParams.delete("q");
+      url.searchParams.delete("code");
+      window.history.pushState({}, "", url.toString());
     }
   }
 
@@ -162,9 +165,13 @@ function LookupContent() {
               fullName={booking.full_name}
               slots={booking.slots}
               paymentMethod={booking.payment_method as PaymentMethod}
-              totalCostCents={booking.total_cost_cents}
+              totalAmount={booking.total_amount}
               bookingDate={booking.booking_date}
               pricePerHourCents={booking.price_per_hour_cents}
+              timezone={booking.court_timezone}
+              gcashNumber={booking.gcash_number}
+              gcashName={booking.gcash_name}
+              messengerUrl={booking.messenger_url}
               onClear={handleClear}
             />
           )}

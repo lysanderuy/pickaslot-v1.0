@@ -13,9 +13,10 @@ interface BookingCardProps {
   fullName: string;
   slots: Slot[];
   paymentMethod: PaymentMethod;
-  totalCostCents: number;
+  totalAmount: number;
   bookingDate: string;
   pricePerHourCents: number;
+  timezone: string;
 }
 
 const PAY_ICON: Record<string, string> = { gcash: "💳", cash: "💵" };
@@ -43,14 +44,17 @@ function slotDateLabel(bookingDate: string, firstSlotStart?: string): string {
   return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(date);
 }
 
-function formatSlotTime(iso: string): string {
-  return new Intl.DateTimeFormat("en", { hour: "numeric", minute: "2-digit", hour12: true }).format(
-    new Date(iso)
-  );
+function formatSlotTime(iso: string, timezone: string): string {
+  return new Intl.DateTimeFormat("en", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: timezone,
+  }).format(new Date(iso));
 }
 
-function formatTimeRange(start: string, end: string): string {
-  return `${formatSlotTime(start)} - ${formatSlotTime(end)}`;
+function formatTimeRange(start: string, end: string, timezone: string): string {
+  return `${formatSlotTime(start, timezone)} - ${formatSlotTime(end, timezone)}`;
 }
 
 function formatMoney(cents: number): string {
@@ -94,12 +98,13 @@ export function BookingCard({
   fullName,
   slots,
   paymentMethod,
-  totalCostCents,
+  totalAmount,
   bookingDate,
   pricePerHourCents,
+  timezone,
 }: BookingCardProps) {
   const pricePerSlot = formatMoney(pricePerHourCents);
-  const total = formatMoney(totalCostCents);
+  const total = formatMoney(totalAmount);
   const payIcon = PAY_ICON[paymentMethod] ?? "";
   const slotGroups = groupSlotsByDate(slots, bookingDate);
 
@@ -134,7 +139,7 @@ export function BookingCard({
                   className="flex items-center justify-between gap-3 border-b border-[#1F3D29] py-2 last:border-b-0"
                 >
                   <span className="min-w-0 text-sm font-bold tracking-[-0.01em] text-[#F0F7F2] sm:text-[15px]">
-                    {formatTimeRange(slot.slot_start_at, slot.slot_end_at)}
+                    {formatTimeRange(slot.slot_start_at, slot.slot_end_at, timezone)}
                   </span>
                   <span className="shrink-0 font-mono text-[11px] text-[#4A6B55]">
                     1 hr · {pricePerSlot}

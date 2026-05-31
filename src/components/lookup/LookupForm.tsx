@@ -16,7 +16,7 @@ export function LookupForm({ value, onChange, onLookup, loading }: LookupFormPro
   return (
     <div className="mb-8 flex flex-col gap-3">
       <label
-        htmlFor="codeInput"
+        htmlFor="lookupInput"
         className="block text-[10px] font-bold uppercase tracking-[0.12em] text-[#4A6B55]"
       >
         Find Your Booking
@@ -24,19 +24,19 @@ export function LookupForm({ value, onChange, onLookup, loading }: LookupFormPro
       <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
         <input
           ref={inputRef}
-          id="codeInput"
+          id="lookupInput"
           type="text"
           value={value}
-          maxLength={8}
+          maxLength={5}
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          placeholder="e.g. 1234-XK9"
+          placeholder="Booking code (e.g. 00042)"
           disabled={loading}
-          onChange={(e) => onChange(e.target.value.toUpperCase())}
+          onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onLookup()}
           className={cx(
-            "min-w-0 flex-1 rounded-[10px] border bg-[#1C3828] px-4 py-3 font-mono text-base font-medium uppercase tracking-[0.06em] text-[#F0F7F2] outline-none transition duration-180 ease-out sm:text-lg",
+            "min-w-0 flex-1 rounded-[10px] border bg-[#1C3828] px-4 py-3 font-mono text-base font-medium text-[#F0F7F2] outline-none transition duration-180 ease-out sm:text-lg",
             "placeholder:text-sm placeholder:tracking-[0.04em] placeholder:text-[#4A6B55]",
             loading ? "cursor-wait border-[#2A4A35] opacity-60" : "border-[#2A4A35]",
             !loading && "focus:border-[#4ADE80] focus:shadow-[0_0_0_3px_rgba(74,222,128,0.1)]"
@@ -52,7 +52,7 @@ export function LookupForm({ value, onChange, onLookup, loading }: LookupFormPro
         </button>
       </div>
       <span className="text-xs font-medium italic text-[#4A6B55]">
-        Your code was shown after submitting your booking request.
+        Enter the 5-digit code from your booking confirmation.
       </span>
     </div>
   );
