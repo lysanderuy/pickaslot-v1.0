@@ -2,16 +2,26 @@ import { createServerClient } from "@supabase/ssr";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { getRequiredEnv } from "@/lib/env";
+import { clientEnv } from "@/lib/env";
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const needsSession =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api/admin") ||
+    pathname.startsWith("/auth/");
+
+  if (!needsSession) {
+    return NextResponse.next({ request });
+  }
+
   const response = NextResponse.next({
     request,
   });
 
   const supabase = createServerClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
+    clientEnv.NEXT_PUBLIC_SUPABASE_URL,
+    clientEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {
@@ -27,7 +37,12 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    const loginUrl = new URL("/login", request.url);
+    return NextResponse.redirect(loginUrl);
+  }
 
   return response;
 }

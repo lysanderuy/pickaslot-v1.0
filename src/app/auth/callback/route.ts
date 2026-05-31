@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
-import { getRequiredEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/env.server";
 
 function isSafeRedirectPath(path: string | null) {
   return !!path && path.startsWith("/");
@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.redirect(new URL(next, request.url));
 
   const supabase = createServerClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
+    serverEnv.NEXT_PUBLIC_SUPABASE_URL,
+    serverEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {

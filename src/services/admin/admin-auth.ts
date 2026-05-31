@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ForbiddenError, UnauthorizedError } from "@/lib/errors";
-import { getDataSource } from "@/lib/db";
-import { ProfileEntity } from "@/lib/db/entities";
+import { db, profiles } from "@/lib/db";
+import { eq } from "drizzle-orm";
 
 export async function requireAdminProfile() {
   const supabase = await createSupabaseServerClient();
@@ -14,8 +14,9 @@ export async function requireAdminProfile() {
     throw new UnauthorizedError();
   }
 
-  const db = await getDataSource();
-  const profile = await db.getRepository(ProfileEntity).findOneBy({ id: user.id });
+  const profile = await db.query.profiles.findFirst({
+    where: eq(profiles.id, user.id),
+  });
 
   if (!profile?.isAdmin) {
     throw new ForbiddenError();
