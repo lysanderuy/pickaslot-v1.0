@@ -1,9 +1,16 @@
-export { AppDataSource, getDataSource } from "./data-source";
+export { db } from "./client";
+export { sql } from "drizzle-orm";
 export {
-  BookingEntity,
-  BookingSlotEntity,
+  bookings,
+  bookingSlots,
+  courts,
+  profiles,
+  bookingStatusEnum,
+  paymentMethodEnum,
   BookingStatus,
-  CourtEntity,
   PaymentMethod,
-  ProfileEntity,
-} from "./entities";
+} from "./schema";
+export type {
+  BookingStatus as BookingStatusType,
+  PaymentMethod as PaymentMethodType,
+} from "./schema";

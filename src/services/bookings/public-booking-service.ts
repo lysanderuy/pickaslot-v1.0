@@ -1,9 +1,11 @@
 import { BadRequestError, NotFoundError } from "@/lib/errors";
-import { getDataSource } from "@/lib/db";
+import { db, sql, bookings, bookingSlots, courts } from "@/lib/db";
 import { rethrowPgBusinessRule } from "@/lib/db/pg-errors";
+import { and, eq, gte } from "drizzle-orm";
+import { validateBookingRequest } from "@/services/bookings/booking-validator";
 import type {
+  AvailabilityRow,
   CreateBookingRequestInput,
-  DayAvailabilityRow,
   PublicBookingLookupResult,
 } from "@/types/bookings";
 
@@ -21,31 +23,40 @@ export async function createBookingRequest(input: CreateBookingRequestInput) {
   const fullName = ensureString(input.fullName, "Full name is required");
   const contactNumber = ensureString(input.contactNumber, "Contact number is required");
 
-  if (input.slotStarts.length === 0) {
-    throw new BadRequestError("Select at least one slot");
-  }
+  // Fetch court for validation
+  const court = await db.query.courts.findFirst({
+    where: eq(courts.id, courtId),
+  }) ?? null;
 
-  const db = await getDataSource();
+  // Run TypeScript validation before calling SQL function
+  validateBookingRequest({
+    court,
+    slotStarts: input.slotStarts,
+    paymentMethod: input.paymentMethod,
+  });
 
-  let rows: Array<Record<string, unknown>>;
+  const slotStartsArray = input.slotStarts.map((s) => new Date(s));
+  // Format as PostgreSQL array literal: '{val1,val2,...}'
+  const slotStartsPgArray = `{${slotStartsArray.map((d) => d.toISOString()).join(",")}}`;
+
+  let result;
   try {
-    rows = (await db.query(
-      `
-        select *
-        from public.create_booking_request(
-          $1::uuid,
-          $2::date,
-          $3::text,
-          $4::text,
-          $5::payment_method,
-          $6::timestamptz[]
-        )
-      `,
-      [courtId, bookingDate, fullName, contactNumber, input.paymentMethod, input.slotStarts],
-    )) as Array<Record<string, unknown>>;
+    result = await db.execute(sql`
+      select *
+      from public.create_booking_request(
+        ${courtId}::uuid,
+        ${bookingDate}::date,
+        ${fullName}::text,
+        ${contactNumber}::text,
+        ${input.paymentMethod}::payment_method,
+        ${slotStartsPgArray}::timestamptz[]
+      )
+    `);
   } catch (error) {
     rethrowPgBusinessRule(error);
   }
+
+  const rows = result as Array<Record<string, unknown>>;
 
   if (rows.length === 0) {
     throw new Error("Booking request failed without a response");
@@ -54,31 +65,55 @@ export async function createBookingRequest(input: CreateBookingRequestInput) {
   return rows[0];
 }
 
-export async function lookupBookingByCode(bookingCode: string) {
+export async function lookupBookingByCode(bookingCode: string): Promise<PublicBookingLookupResult> {
   const code = ensureString(bookingCode, "Booking code is required");
-  const db = await getDataSource();
-  const rows = (await db.query(
-    `select * from public.lookup_booking_by_code($1::text)`,
-    [code],
-  )) as PublicBookingLookupResult[];
 
-  const booking = rows[0];
+  const [row] = await db
+    .select({
+      booking_code: bookings.bookingCode,
+      full_name: bookings.fullName,
+      status: bookings.status,
+      payment_method: bookings.paymentMethod,
+      price_per_hour_cents: bookings.pricePerHourCentsSnapshot,
+      total_amount: bookings.totalAmount,
+      booking_date: bookings.bookingDate,
+      court_timezone: courts.timezone,
+      gcash_number: courts.gcashNumber,
+      gcash_name: courts.gcashName,
+      messenger_url: courts.messengerUrl,
+      slots: sql<Array<{ slot_start_at: string; slot_end_at: string }>>`
+        coalesce(
+          json_agg(
+            json_build_object(
+              'slot_start_at', ${bookingSlots.slotStartAt},
+              'slot_end_at', ${bookingSlots.slotEndAt}
+            )
+            order by ${bookingSlots.slotStartAt}
+          ),
+          '[]'::json
+        )
+      `,
+    })
+    .from(bookings)
+    .innerJoin(courts, eq(bookings.courtId, courts.id))
+    .innerJoin(bookingSlots, eq(bookingSlots.bookingId, bookings.id))
+    .where(and(eq(bookings.bookingCode, code), gte(bookings.bookingDate, sql`current_date`)))
+    .groupBy(bookings.id, courts.id);
 
-  if (!booking) {
+  if (!row) {
     throw new NotFoundError("Booking not found");
   }
 
-  return booking;
+  return row as PublicBookingLookupResult;
 }
 
+
 export async function getDayAvailability(courtId: string, bookingDate: string) {
-  const db = await getDataSource();
-  return (await db.query(
-    `
-      select *
-      from public.get_day_availability($1::uuid, $2::date)
-      order by slot_start_at asc
-    `,
-    [courtId, bookingDate],
-  )) as DayAvailabilityRow[];
+  const result = await db.execute(sql`
+    select *
+    from public.get_day_availability(${courtId}::uuid, ${bookingDate}::date)
+    order by slot_start_at asc
+  `);
+
+  return result as unknown as AvailabilityRow[];
 }
