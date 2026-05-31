@@ -83,9 +83,9 @@ Admin routes are protected server-side. Only users with `profiles.is_admin = tru
 | Framework | [Next.js 16](https://nextjs.org) (App Router) |
 | UI | React 19, Tailwind CSS 4 |
 | Database | PostgreSQL (via Supabase) |
-| ORM | TypeORM |
+| ORM | Drizzle ORM |
 | Auth | Supabase Auth (admin only) |
-| Business logic | PostgreSQL functions (`create_booking_request`, `lookup_booking_by_code`, `get_day_availability`) |
+| Business logic | PostgreSQL functions (`create_booking_request`, `get_day_availability`) + TypeScript validation |
 
 ---
 

@@ -2,7 +2,7 @@ import type { HTMLAttributes } from "react";
 
 import { cx } from "@/lib/cx";
 
-interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {}
+type SkeletonProps = HTMLAttributes<HTMLDivElement>;
 
 export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
