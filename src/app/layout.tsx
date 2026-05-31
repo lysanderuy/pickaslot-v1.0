@@ -17,10 +17,10 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pickaslot.vercel.app"),
-  title: "PickASlot · Villa del Rio Court Booking System",
+  title: "PickASlot - Villa del Rio Court Booking System",
   description: "Book your Tennis or Pickleball slots at Villa del Rio Court.",
   openGraph: {
-    title: "PickASlot · Villa del Rio Court Booking System",
+    title: "PickASlot - Villa del Rio Court Booking System",
     description: "Book your Tennis or Pickleball slots at Villa del Rio Court.",
     siteName: "PickASlot",
     images: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "PickASlot · Villa del Rio",
+    title: "PickASlot - Villa del Rio Court Booking System",
     description:
       "Book your Tennis or Pickleball slots at Villa del Rio Court.",
     images: ["/og-image.png"],

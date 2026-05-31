@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "PickASlot Admin · Villa del Rio",
+    title: "PickASlot Admin - Villa del Rio Court Booking System",
     description: "Court Booking Management System for Villa del Rio.",
     robots: {
         index: false,
