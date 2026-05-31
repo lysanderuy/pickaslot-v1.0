@@ -6,12 +6,12 @@ import type { AvailabilityRow } from "@/types/bookings";
 
 interface ReserveBarProps {
   selectedSlots: AvailabilityRow[];
-  totalCostCents: number;
+  totalAmount: number;
   currencyCode: string;
   onClick: () => void;
 }
 
-export function ReserveBar({ selectedSlots, totalCostCents, currencyCode, onClick }: ReserveBarProps) {
+export function ReserveBar({ selectedSlots, totalAmount, currencyCode, onClick }: ReserveBarProps) {
   const slotCount = selectedSlots.length;
 
   return (
@@ -46,7 +46,7 @@ export function ReserveBar({ selectedSlots, totalCostCents, currencyCode, onClic
           </span>
           <span className="flex shrink-0 items-center gap-2 sm:gap-2.5">
             <span className="text-lg font-extrabold leading-none tracking-[-0.02em] text-[#0F2418] sm:text-[22px]">
-              {formatMoney(totalCostCents, currencyCode)}
+              {formatMoney(totalAmount, currencyCode)}
             </span>
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[rgba(15,36,24,0.12)] text-lg text-[#0F2418] sm:h-[34px] sm:w-[34px] sm:text-xl">
               →

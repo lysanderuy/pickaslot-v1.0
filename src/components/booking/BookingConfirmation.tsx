@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cx } from "@/lib/cx";
 import { formatTimeRange } from "@/lib/bookings/formatting";
 import { tw } from "@/lib/ui/tokens";
-import type { AvailabilityRow } from "@/types/bookings";
+import type { AvailabilityRow, PaymentMethod } from "@/types/bookings";
 
 interface BookingConfirmationProps {
   open: boolean;
@@ -12,23 +12,44 @@ interface BookingConfirmationProps {
   slots: AvailabilityRow[];
   priceLabel: string;
   timezone: string;
+  paymentMethod: PaymentMethod;
+  gcashNumber: string | null;
+  gcashName: string | null;
+  messengerUrl: string | null;
   onClose: () => void;
 }
 
-/**
- * Full-screen confirmation that appears after a successful booking submission.
- * Design matches the `.cs` pattern from the design reference.
- */
 export function BookingConfirmation({
   open,
   code,
   slots,
   priceLabel,
   timezone,
+  paymentMethod,
+  gcashNumber,
+  gcashName,
+  messengerUrl,
   onClose,
 }: BookingConfirmationProps) {
   const [copied, setCopied] = useState(false);
   const slotListScrollable = slots.length > 4;
+
+  const messengerHref = (() => {
+    if (!messengerUrl || paymentMethod !== "gcash" || !slots.length) return messengerUrl;
+    const name = slots[0]?.full_name ?? "";
+    const date = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      timeZone: timezone,
+    }).format(new Date(slots[0].slot_start_at));
+    const timeRange = formatTimeRange(
+      slots[0].slot_start_at,
+      slots[slots.length - 1].slot_end_at,
+      timezone,
+    );
+    const text = `Hi! I just booked for ${name} on ${date} at ${timeRange}. My booking code is ${code}. Sending my GCash receipt now!`;
+    return `${messengerUrl}?text=${encodeURIComponent(text)}`;
+  })();
 
   async function handleCopyCode() {
     if (!code) return;
@@ -85,8 +106,7 @@ export function BookingConfirmation({
             <em className="not-italic text-[#4ADE80]">queue.</em>
           </h1>
           <p className="text-[13px] leading-[1.5] text-[#8AAF95]">
-            Admin will confirm shortly. Save your booking code; you&apos;ll need it to check
-            your status.
+            Admin will confirm once payment is received. Follow the steps below.
           </p>
         </div>
 
@@ -95,7 +115,6 @@ export function BookingConfirmation({
           {/* Booking code */}
           <div className="relative mb-4 overflow-hidden rounded-2xl border border-[#2A4A35] bg-[#162E20] p-[18px]">
             <div className="absolute left-0 right-0 top-0 h-0.5 bg-[linear-gradient(90deg,#4ADE80,transparent)]" />
-
             <div className={tw.sectionLabel}>Your Booking Code</div>
             <div className="mt-2.5 flex items-center justify-between gap-3">
               <div className="min-w-0 font-mono text-[36px] font-medium leading-none tracking-[0.06em] text-[#4ADE80] md:text-[42px]">
@@ -162,24 +181,75 @@ export function BookingConfirmation({
             </div>
           </div>
 
-          {/* Warning banner */}
-          <div className="flex items-start gap-2.5 rounded-[10px] border border-[rgba(251,191,36,0.2)] bg-[rgba(251,191,36,0.1)] px-3.5 py-[13px]">
-            <span aria-hidden="true">⚠️</span>
-            <span className="text-xs font-medium leading-[1.5] text-[#FBBF24]">
-              Screenshot this screen. This code won&apos;t appear again. Use it under My
-              Booking to check your status.
-            </span>
+          {/* What to do now */}
+          <div className="mb-4 rounded-xl border border-[#2A4A35] bg-[#162E20] px-4 py-3.5">
+            <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#4A6B55]">
+              What to do now
+            </div>
+            {paymentMethod === "gcash" ? (
+              <div className="flex flex-col gap-3">
+                <p className="text-[13px] font-medium leading-[1.55] text-[#8AAF95]">
+                  Send your GCash payment
+                  {gcashName && gcashNumber ? (
+                    <>
+                      {" "}to{" "}
+                      <strong className="font-semibold text-[#F0F7F2]">{gcashName}</strong>
+                      {" · "}
+                      <strong className="font-semibold text-[#F0F7F2]">{gcashNumber}</strong>
+                    </>
+                  ) : gcashNumber ? (
+                    <>
+                      {" "}to{" "}
+                      <strong className="font-semibold text-[#F0F7F2]">{gcashNumber}</strong>
+                    </>
+                  ) : null}
+                  {", "}then tap below to send your GCash receipt.
+                </p>
+                {messengerHref && (
+                  <a
+                    href={messengerHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-[10px] border border-[rgba(74,222,128,0.25)] bg-[rgba(74,222,128,0.07)] px-4 py-2.5 text-[13px] font-bold text-[#4ADE80] transition-opacity duration-[150ms] active:opacity-75"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-4 w-4 shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2C6.477 2 2 6.145 2 11.243c0 2.908 1.332 5.507 3.425 7.27V22l3.162-1.738A11.08 11.08 0 0 0 12 20.486c5.523 0 10-4.144 10-9.243C22 6.145 17.523 2 12 2zm.994 12.44-2.548-2.716-4.973 2.716 5.469-5.805 2.612 2.716 4.908-2.716-5.468 5.805z" />
+                    </svg>
+                    Send Receipt on Messenger
+                  </a>
+                )}
+              </div>
+            ) : (
+              <p className="text-[13px] font-medium leading-[1.55] text-[#8AAF95]">
+                Show your booking code{" "}
+                <strong className="font-semibold text-[#F0F7F2]">{code}</strong> or your name when you arrive at the court. Pay cash on-site.
+              </p>
+            )}
+          </div>
+
+          {/* Find it again */}
+          <div className="flex items-start gap-2.5 rounded-[10px] border border-[#2A4A35] px-3.5 py-3">
+            <span className="mt-px shrink-0 text-[11px] font-bold text-[#4A6B55]">i</span>
+            <p className="text-[12px] font-medium leading-[1.5] text-[#4A6B55]">
+              Lost this screen? Find your booking anytime at{" "}
+              <strong className="font-semibold text-[#8AAF95]">/lookup</strong> using your phone number.
+            </p>
           </div>
         </div>
 
-        {/* Done button - label centered; safe-area spacer below so text isn't pushed up */}
+        {/* Done button */}
         <button
           type="button"
           className="flex w-full shrink-0 flex-col bg-[#F0F7F2] transition-opacity duration-[150ms] active:opacity-85"
           onClick={onClose}
         >
           <span className="flex min-h-[52px] items-center justify-center px-[22px] py-3.5 text-[15px] font-extrabold text-[#0F2418]">
-            Got it, I saved the code
+            Got it
           </span>
           <span
             className="block h-[max(0.5rem,env(safe-area-inset-bottom,0px))] shrink-0 md:hidden"

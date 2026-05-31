@@ -1,13 +1,14 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 
 import { cx } from "@/lib/cx";
 import { formatMoney, formatClockValue } from "@/lib/bookings/formatting";
-import { isSoon } from "@/lib/bookings/availability";
+import { isSoon, areSlotsContinuous } from "@/lib/bookings/availability";
 import { toDateKey } from "@/lib/date/utils";
-import { getToday } from "@/lib/date/calendar";
+import { useCourt } from "@/hooks/useCourt";
+import { useBookingSubmit } from "@/hooks/useBookingSubmit";
+import { BookingProvider, useBooking } from "@/contexts/BookingContext";
 import { Nav } from "@/components/Nav";
 import { DatePicker } from "@/components/booking/DatePicker";
 import { HeroStat } from "@/components/booking/HeroStat";
@@ -19,220 +20,95 @@ import { BookingSheet } from "@/components/booking/BookingSheet";
 import { BookingConfirmation } from "@/components/booking/BookingConfirmation";
 import { WarningModal } from "@/components/booking/WarningModal";
 import { BookPageSkeleton } from "@/components/booking/BookPageSkeleton";
-import type {
-  Court,
-  AvailabilityRow,
-  BookingResponse,
-  Confirmation,
-  PaymentMethod,
-} from "@/types/bookings";
+import type { Confirmation } from "@/types/bookings";
 
 const cardClass = "border border-[#2A4A35] bg-[#162E20]";
 
-export default function BookPage() {
-  const [court, setCourt] = useState<Court | null>(null);
-  const [courtError, setCourtError] = useState("");
-  const [courtLoading, setCourtLoading] = useState(true);
-  const [availability, setAvailability] = useState<AvailabilityRow[]>([]);
-  const [availabilityLoading, setAvailabilityLoading] = useState(true);
-  const [availabilityError, setAvailabilityError] = useState("");
-  const [selectedDate, setSelectedDate] = useState(() => getToday());
-  const [calendarMonth, setCalendarMonth] = useState(() => {
-    const today = getToday();
-    return { year: today.getFullYear(), month: today.getMonth() };
-  });
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const [selectedSlotStarts, setSelectedSlotStarts] = useState<string[]>([]);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [warningOpen, setWarningOpen] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("gcash");
-  const [submitError, setSubmitError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+function BookPageContent() {
+  const {
+    selectedDate,
+    selectedSlotStarts,
+    setSelectedSlotStarts,
+    sheetOpen,
+    setSheetOpen,
+    warningOpen,
+    setWarningOpen,
+    warningType,
+    setWarningType,
+    fullName,
+    setFullName,
+    contactNumber,
+    setContactNumber,
+    paymentMethod,
+    confirmation,
+    setConfirmation,
+  } = useBooking();
 
   const selectedDateKey = toDateKey(selectedDate);
-  const selectedSlots = availability.filter((row) => selectedSlotStarts.includes(row.slot_start_at));
+
+  const {
+    court,
+    courtError,
+    courtLoading,
+    availability,
+    availabilityError,
+    availabilityLoading,
+    refreshCourt,
+    refreshAvailability,
+  } = useCourt(selectedDateKey);
+
+  // Filter to only currently available slots (re-computed on every render)
+  const selectedSlots = availability.filter(
+    (row) => selectedSlotStarts.includes(row.slot_start_at) && row.slot_state === "available"
+  );
+
+  const handleBookingSuccess = useCallback(
+    (conf: Confirmation) => {
+      setConfirmation(conf);
+      setSheetOpen(false);
+      setSelectedSlotStarts([]);
+      setFullName("");
+      setContactNumber("");
+      refreshAvailability();
+    },
+    [setConfirmation, setSheetOpen, setSelectedSlotStarts, setFullName, setContactNumber, refreshAvailability]
+  );
+
+  const { submitting, submitError, submitBooking } = useBookingSubmit({
+    court,
+    selectedDateKey,
+    selectedSlots,
+    fullName,
+    contactNumber,
+    paymentMethod,
+    onSuccess: handleBookingSuccess,
+  });
+
   const openCount = availability.filter((row) => row.slot_state === "available").length;
-  const totalCostCents = selectedSlots.length * (court?.pricePerHourCents ?? 0);
+  const totalAmount = selectedSlots.length * (court?.pricePerHourCents ?? 0);
   const priceLabel = court ? formatMoney(court.pricePerHourCents, court.currencyCode) : "-";
   const hoursLabel = court ? `${formatClockValue(court.openTime)} - ${formatClockValue(court.closeTime)}` : "-";
   const acceptingBookings = court?.isAcceptingBookings ?? false;
 
-  async function fetchCourt() {
-    const response = await fetch("/api/courts/current", { cache: "no-store" });
-    const payload = (await response.json()) as { court?: Court; error?: string };
-    if (!response.ok || !payload.court) {
-      throw new Error(payload.error ?? "Failed to load court details");
-    }
-    return payload.court;
-  }
-
-  async function fetchAvailability(nextCourt: Court, dateKey: string) {
-    const params = new URLSearchParams({ courtId: nextCourt.id, bookingDate: dateKey });
-    const response = await fetch(`/api/bookings/availability?${params.toString()}`, { cache: "no-store" });
-    const payload = (await response.json()) as { availability?: AvailabilityRow[]; error?: string };
-    if (!response.ok || !payload.availability) {
-      throw new Error(payload.error ?? "Failed to load availability");
-    }
-    return payload.availability;
-  }
-
-
-  function applyAvailability(nextAvailability: AvailabilityRow[]) {
-    setAvailability(nextAvailability);
-    setSelectedSlotStarts((current) =>
-      current.filter((slotStart) =>
-        nextAvailability.some((row) => row.slot_start_at === slotStart && row.slot_state === "available")
-      )
-    );
-  }
-
-  async function loadCourt() {
-    setCourtLoading(true);
-    setCourtError("");
-    try {
-      setCourt(await fetchCourt());
-    } catch (error) {
-      setCourtError(error instanceof Error ? error.message : "Failed to load court details");
-    } finally {
-      setCourtLoading(false);
-    }
-  }
-
-  async function loadAvailability(nextCourt: Court, dateKey: string) {
-    setAvailabilityLoading(true);
-    setAvailabilityError("");
-    try {
-      applyAvailability(await fetchAvailability(nextCourt, dateKey));
-    } catch (error) {
-      setAvailability([]);
-      setAvailabilityError(error instanceof Error ? error.message : "Failed to load availability");
-    } finally {
-      setAvailabilityLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    let active = true;
-    async function loadInitialCourt() {
-      try {
-        const nextCourt = await fetchCourt();
-        if (active) setCourt(nextCourt);
-      } catch (error) {
-        if (active) setCourtError(error instanceof Error ? error.message : "Failed to load court details");
-      } finally {
-        if (active) setCourtLoading(false);
-      }
-    }
-    void loadInitialCourt();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!court) return;
-    let active = true;
-    const currentCourt = court;
-    async function loadSelectedDateAvailability() {
-      if (active) {
-        setAvailabilityLoading(true);
-        setAvailabilityError("");
-      }
-      try {
-        const nextAvailability = await fetchAvailability(currentCourt, selectedDateKey);
-        if (active) applyAvailability(nextAvailability);
-      } catch (error) {
-        if (active) {
-          setAvailability([]);
-          setAvailabilityError(error instanceof Error ? error.message : "Failed to load availability");
-        }
-      } finally {
-        if (active) setAvailabilityLoading(false);
-      }
-    }
-    void loadSelectedDateAvailability();
-    return () => {
-      active = false;
-    };
-  }, [court, selectedDateKey]);
-
-  function pickDate(date: Date) {
-    setAvailabilityLoading(true);
-    setSelectedDate(date);
-    setSelectedSlotStarts([]);
-    setCalendarOpen(false);
-  }
-
-  function shiftMonth(delta: number) {
-    setCalendarMonth((current) => {
-      const date = new Date(current.year, current.month + delta, 1);
-      return { year: date.getFullYear(), month: date.getMonth() };
-    });
-  }
-
   function openSheet() {
-    setSubmitError("");
-    if (selectedSlots.some((row) => isSoon(row))) {
+    if (!areSlotsContinuous(selectedSlots)) {
+      setWarningType("continuous");
       setWarningOpen(true);
       return;
     }
+
+    if (selectedSlots.some((row) => isSoon(row))) {
+      setWarningType("imminent");
+      setWarningOpen(true);
+      return;
+    }
+
     setSheetOpen(true);
   }
 
   function proceedFromWarning() {
     setWarningOpen(false);
     setSheetOpen(true);
-  }
-
-  async function submitBooking(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!court) {
-      setSubmitError("Court details are still loading. Please try again.");
-      return;
-    }
-    if (!fullName.trim() || !contactNumber.trim()) {
-      setSubmitError("Please fill in your name and contact number.");
-      return;
-    }
-    if (selectedSlots.length === 0) {
-      setSubmitError("Select at least one slot.");
-      return;
-    }
-
-    setSubmitting(true);
-    setSubmitError("");
-    try {
-      const response = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          courtId: court.id,
-          bookingDate: selectedDateKey,
-          fullName: fullName.trim(),
-          contactNumber: contactNumber.trim(),
-          paymentMethod,
-          slotStarts: selectedSlots.map((slot) => slot.slot_start_at),
-        }),
-      });
-      const payload = (await response.json()) as BookingResponse & { error?: string };
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to submit booking");
-      }
-      const code = payload.booking.booking_code ?? payload.booking.bookingCode ?? "Pending";
-      setConfirmation({ code, slots: selectedSlots });
-      setSheetOpen(false);
-      setSelectedSlotStarts([]);
-      setFullName("");
-      setContactNumber("");
-      await loadAvailability(court, selectedDateKey);
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Failed to submit booking");
-    } finally {
-      setSubmitting(false);
-    }
   }
 
   if (courtLoading) {
@@ -254,7 +130,7 @@ export default function BookPage() {
             <p className="mt-2 text-sm text-[#8AAF95]">{courtError || "Please try again in a moment."}</p>
             <button
               type="button"
-              onClick={loadCourt}
+              onClick={refreshCourt}
               className="mt-4 rounded-full bg-[#4ADE80] px-5 py-2 text-sm font-black text-[#0F2418]"
             >
               Retry
@@ -336,28 +212,15 @@ export default function BookPage() {
 
         <div className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 xl:grid-cols-[1fr_400px]">
           <div>
-            <DatePicker
-              selectedDate={selectedDate}
-              calendarMonth={calendarMonth}
-              calendarOpen={calendarOpen}
-              onCalendarToggle={() => {
-                setCalendarMonth({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
-                setCalendarOpen((current) => !current);
-              }}
-              onShiftMonth={shiftMonth}
-              onPickDate={pickDate}
-              loading={availabilityLoading}
-            />
+            <DatePicker />
 
             <SlotGrid
               availability={availability}
-              selectedSlotStarts={selectedSlotStarts}
-              onSlotSelect={setSelectedSlotStarts}
               loading={availabilityLoading}
               acceptingBookings={acceptingBookings}
               timezone={court.timezone}
-              error={availabilityError}
-              onRetry={() => loadAvailability(court, selectedDateKey)}
+              error={availabilityError ?? undefined}
+              onRetry={refreshAvailability}
             />
           </div>
 
@@ -377,7 +240,7 @@ export default function BookPage() {
 
       <ReserveBar
         selectedSlots={selectedSlots}
-        totalCostCents={totalCostCents}
+        totalAmount={totalAmount}
         currencyCode={court.currencyCode}
         onClick={openSheet}
       />
@@ -386,17 +249,11 @@ export default function BookPage() {
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         selectedSlots={selectedSlots}
-        totalCostCents={totalCostCents}
+        totalAmount={totalAmount}
         currencyCode={court.currencyCode}
         timezone={court.timezone}
         priceLabel={priceLabel}
         onSubmit={submitBooking}
-        fullName={fullName}
-        setFullName={setFullName}
-        contactNumber={contactNumber}
-        setContactNumber={setContactNumber}
-        paymentMethod={paymentMethod}
-        setPaymentMethod={setPaymentMethod}
         submitError={submitError}
         submitting={submitting}
       />
@@ -405,12 +262,39 @@ export default function BookPage() {
         open={!!confirmation}
         code={confirmation?.code ?? ""}
         slots={confirmation?.slots ?? []}
+        paymentMethod={confirmation?.paymentMethod ?? "gcash"}
         priceLabel={priceLabel}
         timezone={court.timezone}
+        gcashNumber={court.gcashNumber}
+        gcashName={court.gcashName}
+        messengerUrl={court.messengerUrl}
         onClose={() => setConfirmation(null)}
       />
 
-      <WarningModal open={warningOpen} onGoBack={() => setWarningOpen(false)} onContinue={proceedFromWarning} />
+      {warningType === "imminent" ? (
+        <WarningModal
+          open={warningOpen}
+          type="imminent"
+          onGoBack={() => setWarningOpen(false)}
+          onContinue={proceedFromWarning}
+        />
+      ) : (
+        <WarningModal
+          open={warningOpen}
+          type="continuous"
+          selectedSlots={selectedSlots}
+          timezone={court.timezone}
+          onGoBack={() => setWarningOpen(false)}
+        />
+      )}
     </div>
+  );
+}
+
+export default function BookPage() {
+  return (
+    <BookingProvider>
+      <BookPageContent />
+    </BookingProvider>
   );
 }

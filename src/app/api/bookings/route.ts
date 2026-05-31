@@ -1,48 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 import { createBookingRequest } from "@/services/bookings/public-booking-service";
 import { BadRequestError, AppError } from "@/lib/errors";
-import { PaymentMethod } from "@/lib/db";
 
-function parseJsonBody(body: unknown) {
-  if (!body || typeof body !== "object") {
-    throw new BadRequestError("Invalid request body");
-  }
-
-  return body as Record<string, unknown>;
-}
+const BookingRequestSchema = z.object({
+  courtId: z.string().min(1),
+  bookingDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  fullName: z.string().min(1),
+  contactNumber: z.string().min(1),
+  paymentMethod: z.enum(["gcash", "cash"]),
+  slotStarts: z.array(z.string().min(1)).min(1),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const body = parseJsonBody(await request.json());
+    const json = await request.json();
+    const result = BookingRequestSchema.safeParse(json);
 
-    const courtId = body.courtId;
-    const bookingDate = body.bookingDate;
-    const fullName = body.fullName;
-    const contactNumber = body.contactNumber;
-    const paymentMethod = body.paymentMethod;
-    const slotStarts = body.slotStarts;
-
-    if (
-      typeof courtId !== "string" ||
-      typeof bookingDate !== "string" ||
-      typeof fullName !== "string" ||
-      typeof contactNumber !== "string" ||
-      (paymentMethod !== PaymentMethod.Cash && paymentMethod !== PaymentMethod.GCash) ||
-      !Array.isArray(slotStarts) ||
-      slotStarts.some((slot) => typeof slot !== "string")
-    ) {
+    if (!result.success) {
       throw new BadRequestError("Invalid booking payload");
     }
 
-    const booking = await createBookingRequest({
-      courtId,
-      bookingDate,
-      fullName,
-      contactNumber,
-      paymentMethod,
-      slotStarts,
-    });
+    const booking = await createBookingRequest(result.data);
 
     return NextResponse.json({ booking }, { status: 201 });
   } catch (error) {

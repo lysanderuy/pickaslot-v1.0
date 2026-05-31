@@ -48,7 +48,7 @@ export function ReservationList({
         fullName: first?.full_name ?? "Guest",
         duration: sorted.length,
         timeRange: first && last ? formatTimeRange(first.slot_start_at, last.slot_end_at, timezone) : "",
-        totalCostCents: first?.total_cost_cents ?? sorted.length * pricePerHourCents,
+        totalAmount: first?.total_amount ?? sorted.length * pricePerHourCents,
       };
     });
   }, [availability, timezone, pricePerHourCents]);
@@ -106,7 +106,7 @@ export function ReservationList({
                     {reservation.duration} {reservation.duration === 1 ? "hr" : "hrs"}
                   </span>
                   <span className="text-[13px] font-bold text-[#F0F7F2]">
-                    {formatMoney(reservation.totalCostCents, currencyCode)}
+                    {formatMoney(reservation.totalAmount, currencyCode)}
                   </span>
                 </div>
               </article>

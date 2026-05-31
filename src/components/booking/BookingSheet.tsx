@@ -5,7 +5,8 @@ import { formatMoney, formatTimeRange } from "@/lib/bookings/formatting";
 import { tw } from "@/lib/ui/tokens";
 import { FormField } from "@/components/shared/FormField";
 import { PaymentButton } from "@/components/shared/PaymentButton";
-import type { AvailabilityRow, PaymentMethod } from "@/types/bookings";
+import { useBooking } from "@/contexts/BookingContext";
+import type { AvailabilityRow } from "@/types/bookings";
 
 /* ─── Constants ─── */
 
@@ -18,17 +19,11 @@ interface BookingSheetProps {
   open: boolean;
   onClose: () => void;
   selectedSlots: AvailabilityRow[];
-  totalCostCents: number;
+  totalAmount: number;
   currencyCode: string;
   timezone: string;
   priceLabel: string;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  fullName: string;
-  setFullName: (value: string) => void;
-  contactNumber: string;
-  setContactNumber: (value: string) => void;
-  paymentMethod: PaymentMethod;
-  setPaymentMethod: (value: PaymentMethod) => void;
+  onSubmit: () => Promise<void>;
   submitError: string;
   submitting: boolean;
 }
@@ -39,20 +34,22 @@ export function BookingSheet({
   open,
   onClose,
   selectedSlots,
-  totalCostCents,
+  totalAmount,
   currencyCode,
   timezone,
   priceLabel,
   onSubmit,
-  fullName,
-  setFullName,
-  contactNumber,
-  setContactNumber,
-  paymentMethod,
-  setPaymentMethod,
   submitError,
   submitting,
 }: BookingSheetProps) {
+  const {
+    fullName,
+    setFullName,
+    contactNumber,
+    setContactNumber,
+    paymentMethod,
+    setPaymentMethod,
+  } = useBooking();
   const slotListScrollable = selectedSlots.length > 4;
 
   return (
@@ -84,7 +81,10 @@ export function BookingSheet({
       >
         <form
           className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pb-[max(52px,env(safe-area-inset-bottom))] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:px-6 md:pb-6"
-          onSubmit={onSubmit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
         >
           {/* Pull handle */}
           <div className="mx-auto mb-[22px] mt-3.5 h-1 w-9 rounded-sm bg-[#2A4A35]" />
@@ -133,7 +133,7 @@ export function BookingSheet({
             <div className="mt-1.5 flex items-center justify-between border-t border-[#2A4A35] pt-[11px]">
               <span className={tw.sectionLabel}>Estimated Total</span>
               <span className="text-[22px] font-extrabold tracking-[-0.02em] text-[#4ADE80]">
-                {formatMoney(totalCostCents, currencyCode)}
+                {formatMoney(totalAmount, currencyCode)}
               </span>
             </div>
           </div>

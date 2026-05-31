@@ -8,16 +8,7 @@ import { DAYS, DAYS_SHORT, MONTHS } from "@/lib/date/constants";
 import { getToday, dateLabel } from "@/lib/date/formatters";
 import { toDateKey } from "@/lib/date/toDateKey";
 import { useMemo } from "react";
-
-interface DatePickerProps {
-  selectedDate: Date;
-  calendarMonth: { year: number; month: number };
-  calendarOpen: boolean;
-  onCalendarToggle: () => void;
-  onShiftMonth: (delta: number) => void;
-  onPickDate: (date: Date) => void;
-  loading?: boolean;
-}
+import { useBooking } from "@/contexts/BookingContext";
 
 function weekStart(date: Date) {
   const start = new Date(date);
@@ -56,18 +47,37 @@ function getCalendarCells(year: number, month: number) {
   return cells;
 }
 
-export function DatePicker({
-  selectedDate,
-  calendarMonth,
-  calendarOpen,
-  onCalendarToggle,
-  onShiftMonth,
-  onPickDate,
-}: DatePickerProps) {
+export function DatePicker() {
+  const {
+    selectedDate,
+    calendarMonth,
+    setCalendarMonth,
+    calendarOpen,
+    setCalendarOpen,
+    setSelectedDate,
+  } = useBooking();
+
   const calendarCells = useMemo(
     () => getCalendarCells(calendarMonth.year, calendarMonth.month),
     [calendarMonth.year, calendarMonth.month]
   );
+
+  function onCalendarToggle() {
+    setCalendarMonth({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
+    setCalendarOpen((current) => !current);
+  }
+
+  function onShiftMonth(delta: number) {
+    setCalendarMonth((current) => {
+      const date = new Date(current.year, current.month + delta, 1);
+      return { year: date.getFullYear(), month: date.getMonth() };
+    });
+  }
+
+  function onPickDate(date: Date) {
+    setSelectedDate(date);
+    setCalendarOpen(false);
+  }
 
   return (
     <section className="pt-6">

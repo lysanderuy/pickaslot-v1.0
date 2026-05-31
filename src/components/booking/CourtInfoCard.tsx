@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cx } from "@/lib/cx";
+import { formatMoney } from "@/lib/bookings/formatting";
 import { tw } from "@/lib/ui/tokens";
 import type { Court } from "@/types/bookings";
 
@@ -34,8 +35,7 @@ function InfoRow({ icon, label, children }: { icon: string; label: string; child
 export function CourtInfoCard({ court, reserveBarVisible = false }: CourtInfoCardProps) {
   const [open, setOpen] = useState(false);
   const ruleLines = splitLines(court.houseRules ?? "");
-  const paymentLines = splitLines(court.paymentInstructions ?? "");
-  const priceLabel = `${(court.pricePerHourCents / 100).toLocaleString("en-PH", { maximumFractionDigits: 0, style: "currency", currency: "PHP" })}`;
+  const priceLabel = formatMoney(court.pricePerHourCents, court.currencyCode);
 
   return (
     <section
@@ -106,29 +106,25 @@ export function CourtInfoCard({ court, reserveBarVisible = false }: CourtInfoCar
                 </div>
                 <div>
                   <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#4A6B55]">Payment</div>
-                  <div className="text-[13px] font-medium leading-[1.55] text-[#8AAF95]">
-                    {paymentLines.length > 0 ? (
-                      <div className="flex flex-col gap-1.5">
-                        {paymentLines.map((line, i) => {
-                          const sep = line.indexOf(" - ");
-                          const isLast = i === paymentLines.length - 1 && paymentLines.length > 1;
-                          if (sep !== -1 && !isLast) {
-                            return (
-                              <span key={line}>
-                                <strong className="font-semibold text-[#F0F7F2]">{line.slice(0, sep)}</strong>
-                                <span>{line.slice(sep)}</span>
-                              </span>
-                            );
-                          }
-                          return (
-                            <span key={line} className={isLast ? "mt-0.5 text-[11px] italic text-[#4A6B55]" : ""}>
-                              {line}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      "Pay via GCash or cash after admin confirmation."
+                  <div className="flex flex-col gap-1.5 text-[13px] font-medium leading-[1.55] text-[#8AAF95]">
+                    {court.acceptsGcash && (
+                      <span>
+                        <strong className="font-semibold text-[#F0F7F2]">GCash</strong>
+                        {court.gcashName && court.gcashNumber
+                          ? ` — ${court.gcashName} · ${court.gcashNumber}`
+                          : court.gcashNumber
+                          ? ` — ${court.gcashNumber}`
+                          : ""}
+                      </span>
+                    )}
+                    {court.acceptsCash && (
+                      <span>
+                        <strong className="font-semibold text-[#F0F7F2]">Cash</strong>
+                        {" — pay on arrival"}
+                      </span>
+                    )}
+                    {!court.acceptsGcash && !court.acceptsCash && (
+                      <span>Contact the court for payment details.</span>
                     )}
                   </div>
                 </div>

@@ -1,120 +1,76 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Court, AvailabilityRow } from "@/types/bookings";
-import { toDateKey } from "@/lib/date/toDateKey";
-
-interface UseCourtResult {
-  court: Court | null;
-  availability: AvailabilityRow[];
-  courtError: string;
-  availabilityError: string;
-  courtLoading: boolean;
-  availabilityLoading: boolean;
-  loadCourt: () => Promise<void>;
-  loadAvailability: (court: Court, dateKey: string) => Promise<void>;
-}
 
 async function fetchCourt(): Promise<Court> {
-  const response = await fetch("/api/courts/current", { cache: "no-store" });
-  const payload = await response.json();
+  const response = await fetch("/api/courts/current");
+  const payload = (await response.json()) as { court?: Court; error?: string };
   if (!response.ok || !payload.court) {
     throw new Error(payload.error ?? "Failed to load court details");
   }
   return payload.court;
 }
 
-async function fetchAvailability(court: Court, dateKey: string): Promise<AvailabilityRow[]> {
-  const params = new URLSearchParams({ courtId: court.id, bookingDate: dateKey });
-  const response = await fetch(`/api/bookings/availability?${params.toString()}`, { cache: "no-store" });
-  const payload = await response.json();
+async function fetchAvailability(courtId: string, dateKey: string): Promise<AvailabilityRow[]> {
+  const params = new URLSearchParams({ courtId, bookingDate: dateKey });
+  const response = await fetch(`/api/bookings/availability?${params.toString()}`);
+  const payload = (await response.json()) as { availability?: AvailabilityRow[]; error?: string };
   if (!response.ok || !payload.availability) {
     throw new Error(payload.error ?? "Failed to load availability");
   }
   return payload.availability;
 }
 
-export function useCourt(): UseCourtResult {
-  const [court, setCourt] = useState<Court | null>(null);
-  const [availability, setAvailability] = useState<AvailabilityRow[]>([]);
-  const [courtError, setCourtError] = useState("");
-  const [availabilityError, setAvailabilityError] = useState("");
-  const [courtLoading, setCourtLoading] = useState(true);
-  const [availabilityLoading, setAvailabilityLoading] = useState(true);
+export interface UseCourtResult {
+  court: Court | null;
+  courtError: string | null;
+  courtLoading: boolean;
+  availability: AvailabilityRow[];
+  availabilityError: string | null;
+  availabilityLoading: boolean;
+  refreshCourt: () => void;
+  refreshAvailability: () => void;
+}
 
-  const loadCourt = useCallback(async () => {
-    setCourtLoading(true);
-    setCourtError("");
-    try {
-      const fetchedCourt = await fetchCourt();
-      setCourt(fetchedCourt);
-    } catch (error) {
-      setCourtError(error instanceof Error ? error.message : "Failed to load court details");
-    } finally {
-      setCourtLoading(false);
-    }
-  }, []);
+export function useCourt(selectedDateKey: string): UseCourtResult {
+  const queryClient = useQueryClient();
 
-  const loadAvailability = useCallback(async (nextCourt: Court, dateKey: string) => {
-    setAvailabilityLoading(true);
-    setAvailabilityError("");
-    try {
-      const nextAvailability = await fetchAvailability(nextCourt, dateKey);
-      setAvailability(nextAvailability);
-    } catch (error) {
-      setAvailability([]);
-      setAvailabilityError(error instanceof Error ? error.message : "Failed to load availability");
-    } finally {
-      setAvailabilityLoading(false);
-    }
-  }, []);
+  const {
+    data: court,
+    error: courtError,
+    isLoading: courtLoading,
+  } = useQuery<Court, Error>({
+    queryKey: ["court"],
+    queryFn: fetchCourt,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-  // Initial court load
-  /* eslint-disable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect */
-  useEffect(() => {
-    void loadCourt();
-  }, []);
-  /* eslint-enable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect */
+  const {
+    data: availability = [],
+    error: availabilityError,
+    isLoading: availabilityLoading,
+  } = useQuery<AvailabilityRow[], Error>({
+    queryKey: ["availability", court?.id, selectedDateKey],
+    queryFn: () => fetchAvailability(court!.id, selectedDateKey),
+    enabled: !!court,
+    staleTime: 10 * 1000, // 10 seconds
+  });
 
-  // Load availability when court is ready (initial load for today)
-  useEffect(() => {
-    if (!court) return;
+  const refreshCourt = () => {
+    queryClient.invalidateQueries({ queryKey: ["court"] });
+  };
 
-    let active = true;
-
-    async function loadInitialAvailability() {
-      if (!court) return;
-      try {
-        const todayKey = toDateKey(new Date());
-        const nextAvailability = await fetchAvailability(court, todayKey);
-        if (active) {
-          setAvailability(nextAvailability);
-        }
-      } catch (error) {
-        if (active) {
-          setAvailability([]);
-          setAvailabilityError(error instanceof Error ? error.message : "Failed to load availability");
-        }
-      } finally {
-        if (active) {
-          setAvailabilityLoading(false);
-        }
-      }
-    }
-
-    void loadInitialAvailability();
-
-    return () => {
-      active = false;
-    };
-  }, [court]);
+  const refreshAvailability = () => {
+    queryClient.invalidateQueries({ queryKey: ["availability"] });
+  };
 
   return {
-    court,
-    availability,
-    courtError,
-    availabilityError,
+    court: court ?? null,
+    courtError: courtError?.message ?? null,
     courtLoading,
+    availability,
+    availabilityError: availabilityError?.message ?? null,
     availabilityLoading,
-    loadCourt,
-    loadAvailability,
+    refreshCourt,
+    refreshAvailability,
   };
 }

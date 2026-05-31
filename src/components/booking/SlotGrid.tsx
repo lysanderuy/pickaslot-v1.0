@@ -5,11 +5,10 @@ import { formatTimeParts } from "@/lib/bookings/formatting";
 import { uiSlotState } from "@/lib/bookings/availability";
 import { tw } from "@/lib/ui/tokens";
 import type { AvailabilityRow, UiSlotState } from "@/types/bookings";
+import { useBooking } from "@/contexts/BookingContext";
 
 interface SlotGridProps {
   availability: AvailabilityRow[];
-  selectedSlotStarts: string[];
-  onSlotSelect: (slotStarts: string[]) => void;
   loading: boolean;
   acceptingBookings: boolean;
   timezone: string;
@@ -85,14 +84,13 @@ function statusTextClass(state: UiSlotState, selected: boolean) {
 
 export function SlotGrid({
   availability,
-  selectedSlotStarts,
-  onSlotSelect,
   loading,
   acceptingBookings,
   timezone,
   error,
   onRetry,
 }: SlotGridProps) {
+  const { selectedSlotStarts, setSelectedSlotStarts } = useBooking();
   const openCount = availability.filter((row) => row.slot_state === "available").length;
 
   function toggleSlot(row: AvailabilityRow) {
@@ -100,7 +98,7 @@ export function SlotGrid({
       return;
     }
 
-    onSlotSelect(
+    setSelectedSlotStarts(
       selectedSlotStarts.includes(row.slot_start_at)
         ? selectedSlotStarts.filter((slotStart) => slotStart !== row.slot_start_at)
         : [...selectedSlotStarts, row.slot_start_at]
