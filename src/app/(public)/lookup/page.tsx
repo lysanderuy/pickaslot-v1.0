@@ -167,7 +167,7 @@ function LookupContent() {
               paymentMethod={booking.payment_method as PaymentMethod}
               totalAmount={booking.total_amount}
               bookingDate={booking.booking_date}
-              pricePerHourCents={booking.price_per_hour_cents}
+              pricePerHour={booking.price_per_hour}
               timezone={booking.court_timezone}
               gcashNumber={booking.gcash_number}
               gcashName={booking.gcash_name}

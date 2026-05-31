@@ -18,7 +18,7 @@ interface BookingResultProps {
   paymentMethod: PaymentMethod;
   totalAmount: number;
   bookingDate: string;
-  pricePerHourCents: number;
+  pricePerHour: number;
   timezone: string;
   gcashNumber: string | null;
   gcashName: string | null;
@@ -34,7 +34,7 @@ export function BookingResult({
   paymentMethod,
   totalAmount,
   bookingDate,
-  pricePerHourCents,
+  pricePerHour,
   timezone,
   gcashNumber,
   gcashName,
@@ -56,7 +56,7 @@ export function BookingResult({
         paymentMethod={paymentMethod}
         totalAmount={totalAmount}
         bookingDate={bookingDate}
-        pricePerHourCents={pricePerHourCents}
+        pricePerHour={pricePerHour}
         timezone={timezone}
       />
 

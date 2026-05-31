@@ -9,7 +9,7 @@ interface ReservationListProps {
   availability: AvailabilityRow[];
   timezone: string;
   loading: boolean;
-  pricePerHourCents: number;
+  pricePerHour: number;
   currencyCode: string;
 }
 
@@ -17,7 +17,7 @@ export function ReservationList({
   availability,
   timezone,
   loading,
-  pricePerHourCents,
+  pricePerHour,
   currencyCode,
 }: ReservationListProps) {
   const reservations = useMemo<ConfirmedReservation[]>(() => {
@@ -48,10 +48,10 @@ export function ReservationList({
         fullName: first?.full_name ?? "Guest",
         duration: sorted.length,
         timeRange: first && last ? formatTimeRange(first.slot_start_at, last.slot_end_at, timezone) : "",
-        totalAmount: first?.total_amount ?? sorted.length * pricePerHourCents,
+        totalAmount: first?.total_amount ?? sorted.length * pricePerHour,
       };
     });
-  }, [availability, timezone, pricePerHourCents]);
+  }, [availability, timezone, pricePerHour]);
 
   if (loading) {
     return (

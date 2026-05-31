@@ -237,7 +237,7 @@ export function BookingConfirmation({
             <span className="mt-px shrink-0 text-[11px] font-bold text-[#4A6B55]">i</span>
             <p className="text-[12px] font-medium leading-[1.5] text-[#4A6B55]">
               Lost this screen? Find your booking anytime at{" "}
-              <strong className="font-semibold text-[#8AAF95]">/lookup</strong> using your phone number.
+              <strong className="font-semibold text-[#8AAF95]">/lookup</strong> using your booking code.
             </p>
           </div>
         </div>

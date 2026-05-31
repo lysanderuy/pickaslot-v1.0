@@ -7,7 +7,6 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { OverviewBookings } from "@/components/admin/OverviewBookings";
 import { SlotDisplay } from "@/components/admin/SlotDisplay";
 
-// price_per_hour_cents stores PHP directly (not cents) - e.g., 200 means ₱200/hour
 function formatRevenue(amount: number): string {
   return new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -46,7 +45,6 @@ function formatSlotCount(slotCount: unknown): string {
   return `${hrs} hr${hrs !== 1 ? "s" : ""}`;
 }
 
-// price_per_hour_cents stores PHP directly (not cents) - e.g., 200 means ₱200/hour
 function formatAmount(totalAmount: unknown): string {
   const amount = Math.round(Number(totalAmount));
   return `₱${amount.toLocaleString("en-PH")}`;

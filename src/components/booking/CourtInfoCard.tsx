@@ -35,7 +35,7 @@ function InfoRow({ icon, label, children }: { icon: string; label: string; child
 export function CourtInfoCard({ court, reserveBarVisible = false }: CourtInfoCardProps) {
   const [open, setOpen] = useState(false);
   const ruleLines = splitLines(court.houseRules ?? "");
-  const priceLabel = formatMoney(court.pricePerHourCents, court.currencyCode);
+  const priceLabel = formatMoney(court.pricePerHour, court.currencyCode);
 
   return (
     <section

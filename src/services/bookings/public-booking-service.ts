@@ -2,7 +2,6 @@ import { BadRequestError, NotFoundError } from "@/lib/errors";
 import { db, sql, bookings, bookingSlots, courts } from "@/lib/db";
 import { rethrowPgBusinessRule } from "@/lib/db/pg-errors";
 import { and, eq, gte } from "drizzle-orm";
-import { validateBookingRequest } from "@/services/bookings/booking-validator";
 import type {
   AvailabilityRow,
   CreateBookingRequestInput,
@@ -23,18 +22,10 @@ export async function createBookingRequest(input: CreateBookingRequestInput) {
   const fullName = ensureString(input.fullName, "Full name is required");
   const contactNumber = ensureString(input.contactNumber, "Contact number is required");
 
-  // Fetch court for validation
-  const court = await db.query.courts.findFirst({
-    where: eq(courts.id, courtId),
-  }) ?? null;
-
-  // Run TypeScript validation before calling SQL function
-  validateBookingRequest({
-    court,
-    slotStarts: input.slotStarts,
-    paymentMethod: input.paymentMethod,
-  });
-
+  // The SQL function is the single source of truth for booking validation
+  // (court open/closed, slots ended, continuity, court hours, payment method,
+  // slot collisions). Business-rule failures surface as P0001 and are mapped
+  // to client errors by rethrowPgBusinessRule below.
   const slotStartsArray = input.slotStarts.map((s) => new Date(s));
   // Format as PostgreSQL array literal: '{val1,val2,...}'
   const slotStartsPgArray = `{${slotStartsArray.map((d) => d.toISOString()).join(",")}}`;
@@ -74,7 +65,7 @@ export async function lookupBookingByCode(bookingCode: string): Promise<PublicBo
       full_name: bookings.fullName,
       status: bookings.status,
       payment_method: bookings.paymentMethod,
-      price_per_hour_cents: bookings.pricePerHourCentsSnapshot,
+      price_per_hour: bookings.pricePerHourSnapshot,
       total_amount: bookings.totalAmount,
       booking_date: bookings.bookingDate,
       court_timezone: courts.timezone,

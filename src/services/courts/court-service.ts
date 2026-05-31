@@ -21,7 +21,7 @@ export interface CourtSettingsUpdateInput {
   timezone?: string;
   openTime?: string;
   closeTime?: string;
-  pricePerHourCents?: number;
+  pricePerHour?: number;
   currencyCode?: string;
   isAcceptingBookings?: boolean;
   acceptsGcash?: boolean;
@@ -71,7 +71,7 @@ export async function updateCourtSettings(
   if (input.timezone !== undefined) updates.timezone = input.timezone;
   if (input.openTime !== undefined) updates.openTime = input.openTime;
   if (input.closeTime !== undefined) updates.closeTime = input.closeTime;
-  if (input.pricePerHourCents !== undefined) updates.pricePerHourCents = input.pricePerHourCents;
+  if (input.pricePerHour !== undefined) updates.pricePerHour = input.pricePerHour;
   if (input.currencyCode !== undefined) updates.currencyCode = input.currencyCode;
   if (input.isAcceptingBookings !== undefined) updates.isAcceptingBookings = input.isAcceptingBookings;
   if (input.acceptsGcash !== undefined) updates.acceptsGcash = input.acceptsGcash;

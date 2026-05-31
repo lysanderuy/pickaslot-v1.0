@@ -20,9 +20,9 @@ export async function PATCH(
       timezone: typeof body.timezone === "string" ? body.timezone : undefined,
       openTime: typeof body.openTime === "string" ? body.openTime : undefined,
       closeTime: typeof body.closeTime === "string" ? body.closeTime : undefined,
-      pricePerHourCents:
-        typeof body.pricePerHourCents === "number"
-          ? body.pricePerHourCents
+      pricePerHour:
+        typeof body.pricePerHour === "number"
+          ? body.pricePerHour
           : undefined,
       currencyCode:
         typeof body.currencyCode === "string" ? body.currencyCode : undefined,

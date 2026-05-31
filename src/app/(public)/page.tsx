@@ -69,9 +69,8 @@ function BookPageContent() {
       setSelectedSlotStarts([]);
       setFullName("");
       setContactNumber("");
-      refreshAvailability();
     },
-    [setConfirmation, setSheetOpen, setSelectedSlotStarts, setFullName, setContactNumber, refreshAvailability]
+    [setConfirmation, setSheetOpen, setSelectedSlotStarts, setFullName, setContactNumber]
   );
 
   const { submitting, submitError, submitBooking } = useBookingSubmit({
@@ -85,8 +84,8 @@ function BookPageContent() {
   });
 
   const openCount = availability.filter((row) => row.slot_state === "available").length;
-  const totalAmount = selectedSlots.length * (court?.pricePerHourCents ?? 0);
-  const priceLabel = court ? formatMoney(court.pricePerHourCents, court.currencyCode) : "-";
+  const totalAmount = selectedSlots.length * (court?.pricePerHour ?? 0);
+  const priceLabel = court ? formatMoney(court.pricePerHour, court.currencyCode) : "-";
   const hoursLabel = court ? `${formatClockValue(court.openTime)} - ${formatClockValue(court.closeTime)}` : "-";
   const acceptingBookings = court?.isAcceptingBookings ?? false;
 
@@ -229,7 +228,7 @@ function BookPageContent() {
               availability={availability}
               timezone={court.timezone}
               loading={availabilityLoading}
-              pricePerHourCents={court.pricePerHourCents}
+              pricePerHour={court.pricePerHour}
               currencyCode={court.currencyCode}
             />
           </div>

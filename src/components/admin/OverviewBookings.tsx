@@ -52,8 +52,8 @@ function formatSlotCount(slotCount: unknown): string {
 }
 
 function formatAmount(totalAmount: unknown): string {
-  const cost = Math.round(Number(totalAmount) / 100);
-  return `₱${cost.toLocaleString("en-PH")}`;
+  const amount = Math.round(Number(totalAmount));
+  return `₱${amount.toLocaleString("en-PH")}`;
 }
 
 export function OverviewBookings({ pendingBookings }: OverviewBookingsProps) {

@@ -42,8 +42,7 @@ export const courts = pgTable("courts", {
   timezone: text("timezone").notNull(),
   openTime: time("open_time").notNull(),
   closeTime: time("close_time").notNull(),
-  // Price stored as PHP (not cents) - e.g., 200 means ₱200/hour
-  pricePerHourCents: integer("price_per_hour_cents").notNull(),
+  pricePerHour: integer("price_per_hour").notNull(),
   currencyCode: text("currency_code").notNull(),
   isAcceptingBookings: boolean("is_accepting_bookings").notNull().default(true),
   acceptsGcash: boolean("accepts_gcash").notNull().default(true),
@@ -80,7 +79,7 @@ export const bookings = pgTable(
     paymentMethod: paymentMethodEnum("payment_method").notNull(),
     status: bookingStatusEnum("status").notNull(),
     slotCount: integer("slot_count").notNull(),
-    pricePerHourCentsSnapshot: integer("price_per_hour_cents_snapshot").notNull(),
+    pricePerHourSnapshot: integer("price_per_hour_snapshot").notNull(),
     totalAmount: integer("total_amount").notNull(),
     reviewerId: uuid("reviewer_id"),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),

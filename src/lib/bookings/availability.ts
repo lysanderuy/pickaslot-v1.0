@@ -34,9 +34,7 @@ export function areSlotsContinuous(selectedSlots: AvailabilityRow[]): boolean {
 
   // Validate all slots have valid dates before sorting
   for (const slot of selectedSlots) {
-    const startValid = Date.parse(slot.slot_start_at);
-    const endValid = Date.parse(slot.slot_end_at);
-    if (!startValid || !endValid) {
+    if (Number.isNaN(Date.parse(slot.slot_start_at)) || Number.isNaN(Date.parse(slot.slot_end_at))) {
       return false; // Invalid date in slots
     }
   }

@@ -39,7 +39,7 @@ flowchart LR
 
 1. **Browse** — Pick a date and view the hourly slot grid for the court's operating hours.
 2. **Reserve** — Select one or more consecutive or non-consecutive slots, then enter full name, contact number, and payment method.
-3. **Submit** — The app creates a **pending** booking and generates a code (format: `1234-ABC`, derived from the contact number plus a random suffix).
+3. **Submit** — The app creates a **pending** booking and generates a sequential 5-digit code (e.g. `00042`).
 4. **Pay** — Complete payment using the court's GCash details or pay cash as instructed on the confirmation screen.
 5. **Confirm** — An admin verifies payment and confirms the booking. Until then, slots are held as pending and visible to others as unavailable.
 6. **Track** — Use the **Find Booking** page (`/lookup`) with the booking code to check status: pending, confirmed, or rejected.
@@ -51,7 +51,7 @@ flowchart LR
 ### Public (no login)
 
 - **Book** (`/`) — Date picker, live slot availability grid, multi-slot selection, court info (hours, rate, house rules, payment instructions)
-- **Find Booking** (`/lookup`) — Look up any reservation by booking code; supports deep links via `?code=XXXX-XXX`
+- **Find Booking** (`/lookup`) — Look up any reservation by its 5-digit booking code; supports deep links via `?code=00042` (or `?q=`)
 - **Imminent-slot warning** — Prompts users when a selected slot starts within 60 minutes
 - **Booking confirmation** — Full-screen success view with copyable booking code and slot summary
 
@@ -85,7 +85,7 @@ Admin routes are protected server-side. Only users with `profiles.is_admin = tru
 | Database | PostgreSQL (via Supabase) |
 | ORM | Drizzle ORM |
 | Auth | Supabase Auth (admin only) |
-| Business logic | PostgreSQL functions (`create_booking_request`, `get_day_availability`) + TypeScript validation |
+| Business logic | PostgreSQL functions (`create_booking_request`, `get_day_availability`) — the single source of truth for booking validation |
 
 ---
 
@@ -106,7 +106,7 @@ src/
 ├── lib/
 │   ├── bookings/          # Availability helpers, validation, formatting
 │   ├── date/              # Calendar, timezone, date-key utilities
-│   ├── db/                # TypeORM entities and data source
+│   ├── db/                # Drizzle ORM schema and client
 │   └── supabase/          # Server, browser, and admin Supabase clients
 ├── services/
 │   ├── bookings/          # Public booking service
@@ -201,7 +201,7 @@ DATABASE_SSL=true
 
    - Court name and location
    - Operating hours and timezone (`Asia/Manila` recommended for Cebu)
-   - Hourly rate (stored in centavos, e.g. `15000` = ₱150.00/hr)
+   - Hourly rate (whole pesos, e.g. `200` = ₱200/hr)
    - House rules and GCash payment instructions
 
 3. Promote an admin user by setting `is_admin = true` on their row in `profiles` after they sign up through Supabase Auth.

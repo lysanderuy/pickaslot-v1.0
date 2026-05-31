@@ -97,7 +97,7 @@ const BOOKING_SELECT = {
   paymentMethod: bookings.paymentMethod,
   status: bookings.status,
   slotCount: bookings.slotCount,
-  pricePerHourCentsSnapshot: bookings.pricePerHourCentsSnapshot,
+  pricePerHourSnapshot: bookings.pricePerHourSnapshot,
   totalAmount: bookings.totalAmount,
   reviewedAt: bookings.reviewedAt,
   rejectedReason: bookings.rejectedReason,

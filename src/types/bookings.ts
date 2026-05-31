@@ -10,7 +10,7 @@ export interface Court {
   timezone: string;
   openTime: string;
   closeTime: string;
-  pricePerHourCents: number;
+  pricePerHour: number;
   currencyCode: string;
   isAcceptingBookings: boolean;
   acceptsGcash: boolean;
@@ -37,7 +37,7 @@ export interface PublicBookingLookupResult {
   full_name: string;
   status: "pending" | "confirmed" | "rejected";
   payment_method: PaymentMethod;
-  price_per_hour_cents: number;
+  price_per_hour: number;
   total_amount: number;
   booking_date: string;
   court_timezone: string;

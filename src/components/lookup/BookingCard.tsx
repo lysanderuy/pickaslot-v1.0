@@ -15,7 +15,7 @@ interface BookingCardProps {
   paymentMethod: PaymentMethod;
   totalAmount: number;
   bookingDate: string;
-  pricePerHourCents: number;
+  pricePerHour: number;
   timezone: string;
 }
 
@@ -57,8 +57,8 @@ function formatTimeRange(start: string, end: string, timezone: string): string {
   return `${formatSlotTime(start, timezone)} - ${formatSlotTime(end, timezone)}`;
 }
 
-function formatMoney(cents: number): string {
-  return `₱${(cents / 100).toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
+function formatMoney(amount: number): string {
+  return `₱${amount.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
 }
 
 function calendarDateKey(value: string): string {
@@ -100,10 +100,10 @@ export function BookingCard({
   paymentMethod,
   totalAmount,
   bookingDate,
-  pricePerHourCents,
+  pricePerHour,
   timezone,
 }: BookingCardProps) {
-  const pricePerSlot = formatMoney(pricePerHourCents);
+  const pricePerSlot = formatMoney(pricePerHour);
   const total = formatMoney(totalAmount);
   const payIcon = PAY_ICON[paymentMethod] ?? "";
   const slotGroups = groupSlotsByDate(slots, bookingDate);
