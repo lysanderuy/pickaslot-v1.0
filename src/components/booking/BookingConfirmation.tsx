@@ -34,22 +34,6 @@ export function BookingConfirmation({
   const [copied, setCopied] = useState(false);
   const slotListScrollable = slots.length > 4;
 
-  const messengerHref = (() => {
-    if (!messengerUrl || paymentMethod !== "gcash" || !slots.length) return messengerUrl;
-    const name = slots[0]?.full_name ?? "";
-    const date = new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      timeZone: timezone,
-    }).format(new Date(slots[0].slot_start_at));
-    const timeRange = formatTimeRange(
-      slots[0].slot_start_at,
-      slots[slots.length - 1].slot_end_at,
-      timezone,
-    );
-    const text = `Hi! I just booked for ${name} on ${date} at ${timeRange}. My booking code is ${code}. Sending my GCash receipt now!`;
-    return `${messengerUrl}?text=${encodeURIComponent(text)}`;
-  })();
 
   async function handleCopyCode() {
     if (!code) return;
@@ -162,7 +146,7 @@ export function BookingConfirmation({
             <div
               className={cx(
                 slotListScrollable &&
-                  "max-h-[min(24vh,168px)] overflow-y-auto overscroll-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                "max-h-[min(24vh,168px)] overflow-y-auto overscroll-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               )}
             >
               {slots.map((slot) => (
@@ -205,9 +189,9 @@ export function BookingConfirmation({
                   ) : null}
                   {", "}then tap below to send your GCash receipt.
                 </p>
-                {messengerHref && (
+                {messengerUrl && (
                   <a
-                    href={messengerHref}
+                    href={messengerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 rounded-[10px] border border-[rgba(74,222,128,0.25)] bg-[rgba(74,222,128,0.07)] px-4 py-2.5 text-[13px] font-bold text-[#4ADE80] transition-opacity duration-[150ms] active:opacity-75"
@@ -225,10 +209,30 @@ export function BookingConfirmation({
                 )}
               </div>
             ) : (
-              <p className="text-[13px] font-medium leading-[1.55] text-[#8AAF95]">
-                Show your booking code{" "}
-                <strong className="font-semibold text-[#F0F7F2]">{code}</strong> or your name when you arrive at the court. Pay cash on-site.
-              </p>
+              <div className="flex flex-col gap-3">
+                <p className="text-[13px] font-medium leading-[1.55] text-[#8AAF95]">
+                  Show your booking code{" "}
+                  <strong className="font-semibold text-[#F0F7F2]">{code}</strong> or your name when you arrive at the court. Pay cash on-site.
+                </p>
+                {messengerUrl && (
+                  <a
+                    href={messengerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-[10px] border border-[rgba(74,222,128,0.25)] bg-[rgba(74,222,128,0.07)] px-4 py-2.5 text-[13px] font-bold text-[#4ADE80] transition-opacity duration-[150ms] active:opacity-75"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-4 w-4 shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2C6.477 2 2 6.145 2 11.243c0 2.908 1.332 5.507 3.425 7.27V22l3.162-1.738A11.08 11.08 0 0 0 12 20.486c5.523 0 10-4.144 10-9.243C22 6.145 17.523 2 12 2zm.994 12.44-2.548-2.716-4.973 2.716 5.469-5.805 2.612 2.716 4.908-2.716-5.468 5.805z" />
+                    </svg>
+                    Notify on Messenger
+                  </a>
+                )}
+              </div>
             )}
           </div>
 
