@@ -17,8 +17,8 @@ function weekStart(date: Date) {
   return start;
 }
 
-function getCalendarCells(year: number, month: number) {
-  const today = getToday();
+function getCalendarCells(year: number, month: number, timeZone: string) {
+  const today = getToday(timeZone);
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const previousMonthDays = new Date(year, month, 0).getDate();
@@ -49,6 +49,7 @@ function getCalendarCells(year: number, month: number) {
 
 export function DatePicker() {
   const {
+    timeZone,
     selectedDate,
     calendarMonth,
     setCalendarMonth,
@@ -58,8 +59,8 @@ export function DatePicker() {
   } = useBooking();
 
   const calendarCells = useMemo(
-    () => getCalendarCells(calendarMonth.year, calendarMonth.month),
-    [calendarMonth.year, calendarMonth.month]
+    () => getCalendarCells(calendarMonth.year, calendarMonth.month, timeZone),
+    [calendarMonth.year, calendarMonth.month, timeZone]
   );
 
   function onCalendarToggle() {
@@ -102,7 +103,7 @@ export function DatePicker() {
           </span>
           <span>
             <span className="block text-sm font-bold leading-none tracking-[-0.01em] text-[#F0F7F2] sm:text-base">
-              {dateLabel(selectedDate)}
+              {dateLabel(selectedDate, timeZone)}
             </span>
             <span className="mt-[3px] block text-[11px] font-medium text-[#8AAF95]">
               {DAYS[selectedDate.getDay()]} · Week {getWeekNumber(selectedDate)}
@@ -165,7 +166,7 @@ export function DatePicker() {
             ))}
             {calendarCells.map((cell, index) => {
               const isSelected = cell.date ? sameDay(cell.date, selectedDate) : false;
-              const isToday = cell.date ? sameDay(cell.date, getToday()) : false;
+              const isToday = cell.date ? sameDay(cell.date, getToday(timeZone)) : false;
 
               return (
                 <button
@@ -193,7 +194,7 @@ export function DatePicker() {
           const start = weekStart(selectedDate);
           const day = new Date(start);
           day.setDate(start.getDate() + index);
-          const today = getToday();
+          const today = getToday(timeZone);
           const disabled = day < today;
           const active = sameDay(day, selectedDate);
           const isToday = sameDay(day, today);

@@ -1,10 +1,13 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { getToday } from "@/lib/date/calendar";
+import { getToday, DEFAULT_TIME_ZONE } from "@/lib/date/calendar";
 import type { Confirmation, PaymentMethod } from "@/types/bookings";
 
 interface BookingContextValue {
+  // Court timezone that anchors every "today" calculation in the booking UI.
+  timeZone: string;
+
   // Date state
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
@@ -44,12 +47,16 @@ const BookingContext = createContext<BookingContextValue | null>(null);
 
 interface BookingProviderProps {
   children: ReactNode;
+  timeZone?: string;
 }
 
-export function BookingProvider({ children }: BookingProviderProps) {
-  const [selectedDate, setSelectedDate] = useState(() => getToday());
+export function BookingProvider({ children, timeZone }: BookingProviderProps) {
+  // Resolve the fallback once here so every consumer downstream reads a concrete
+  // timezone. undefined only reaches this point when the court failed to load.
+  const zone = timeZone ?? DEFAULT_TIME_ZONE;
+  const [selectedDate, setSelectedDate] = useState(() => getToday(zone));
   const [calendarMonth, setCalendarMonth] = useState(() => {
-    const today = getToday();
+    const today = getToday(zone);
     return { year: today.getFullYear(), month: today.getMonth() };
   });
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -63,6 +70,7 @@ export function BookingProvider({ children }: BookingProviderProps) {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const value: BookingContextValue = {
+    timeZone: zone,
     selectedDate,
     setSelectedDate,
     calendarMonth,

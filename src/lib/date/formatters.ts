@@ -1,27 +1,37 @@
 import { DAYS, MONTHS_SHORT } from "./constants";
 import { sameDay } from "./sameDay";
 
-export function getToday(): Date {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
+/**
+ * Fallback timezone for the degraded path where the court record cannot be
+ * loaded at all. The court's `timezone` column is the real source of truth for
+ * "today"; this only keeps the fallback on Cebu time (UTC+8) instead of the
+ * server's UTC clock. The app serves Cebu courts only, and the Philippines
+ * observes no daylight saving, so this offset never shifts.
+ */
+export const DEFAULT_TIME_ZONE = "Asia/Manila";
+
+/**
+ * "Today" at local midnight, computed as the calendar day in `timeZone` rather
+ * than the runtime's own zone. Deriving it from an explicit timezone keeps the
+ * value identical on a UTC server (Vercel) and a client in another zone,
+ * avoiding hydration mismatches and wrong-date query keys. The timezone is
+ * required so a runtime-local "today" can never be reintroduced by accident.
+ */
+export function getToday(timeZone: string): Date {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const part = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return new Date(part("year"), part("month") - 1, part("day"));
 }
 
-export function dateLabel(date: Date): string {
-  const today = getToday();
+export function dateLabel(date: Date, timeZone: string): string {
+  const today = getToday(timeZone);
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   const prefix = sameDay(date, today) ? "Today" : sameDay(date, tomorrow) ? "Tomorrow" : DAYS[date.getDay()];
   return `${prefix}, ${MONTHS_SHORT[date.getMonth()]} ${date.getDate()}`;
-}
-
-export function slotDateLabel(bookingDate: string): string {
-  const today = getToday();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const [y, m, d] = bookingDate.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
-  if (date.getTime() === today.getTime()) return "Today";
-  if (date.getTime() === tomorrow.getTime()) return "Tomorrow";
-  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(date);
 }
