@@ -1,4 +1,4 @@
-# PickASlot
+# PickASlot v1.0
 
 A custom pickleball court booking system built for **Villa del Rio, Babag II, Lapu-Lapu City, Cebu**. PickASlot lets subdivision homeowners and visitors reserve court time online, pay via GCash or cash, and receive confirmation once an admin verifies payment.
 
@@ -60,7 +60,7 @@ flowchart LR
 - **Overview** (`/admin`) — Dashboard entry point
 - **Bookings** (`/admin/bookings`) — List, filter, confirm, or reject pending requests
 - **Schedule** (`/admin/schedule`) — Court schedule view (planned)
-- **Court Settings** (`/admin/settings`) — Hours, pricing, house rules, payment instructions (planned)
+- **Court Settings** (`/admin/settings`) — Court name and location, operating hours, hourly rate, GCash and cash toggles, GCash number and name, Messenger link, house rules
 
 Admin routes are protected server-side. Only users with `profiles.is_admin = true` can access them.
 
@@ -84,6 +84,7 @@ Admin routes are protected server-side. Only users with `profiles.is_admin = tru
 | UI | React 19, Tailwind CSS 4 |
 | Database | PostgreSQL (via Supabase) |
 | ORM | Drizzle ORM |
+| Data fetching | TanStack Query |
 | Auth | Supabase Auth (admin only) |
 | Business logic | PostgreSQL functions (`create_booking_request`, `get_day_availability`) — the single source of truth for booking validation |
 
@@ -99,10 +100,12 @@ src/
 │   ├── api/               # REST API routes
 │   └── auth/              # Supabase auth callback
 ├── components/
+│   ├── admin/             # Admin shell, nav, bookings actions, court settings form
 │   ├── booking/           # Slot grid, date picker, booking sheet, confirmation
 │   ├── lookup/            # Booking lookup form and result cards
-│   └── shared/            # Nav, form fields, payment buttons
-├── hooks/                 # Court, booking submit, lookup hooks
+│   ├── shared/            # Form fields, info rows, payment buttons
+│   └── Nav.tsx            # Public site navigation
+├── hooks/                 # Court and booking submit hooks
 ├── lib/
 │   ├── bookings/          # Availability helpers, validation, formatting
 │   ├── date/              # Calendar, timezone, date-key utilities
